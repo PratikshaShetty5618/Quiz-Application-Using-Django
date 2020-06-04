@@ -1,0 +1,21 @@
+{% extends 'base_nav.html' %}
+{% block body %}
+
+
+<style type="text/css">
+  .container {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      height: 200px;
+      margin-top: -100px /* half of you height */
+      width: 400px;
+      margin-left: -200px /* half of you width */
+  }
+</style>
+
+<div class="container"> 
+  <a href="/"><button type="button" class="btn btn-primary">Create Quiz</button></a>&nbsp;&nbsp;&nbsp;&nbsp;
+  <a href="/"><button type="button" class="btn btn-success">Attempt Quiz</button></a>     
+</div>
+{% endblock body %}
