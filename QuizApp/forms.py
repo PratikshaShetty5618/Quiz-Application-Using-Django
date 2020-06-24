@@ -1,4 +1,14 @@
 from django import forms
+from .models import Quiz
+from . import select_time_widget
+
+class QuizCreateForm(forms.ModelForm):
+	time_limit = forms.TimeField(help_text='Enter data as Hours:Minutes:Seconds i.e. hh:mm:ss .',widget=select_time_widget.SelectTimeWidget())
+
+	class Meta:
+		model = Quiz
+		fields = ['title','description','category','random_order','max_questions','answers_at_end','pass_mark','success_text','fail_text','time_limit']
+
 # from myapp.fields import ListTextWidget
 
 # class FormForm(forms.Form):

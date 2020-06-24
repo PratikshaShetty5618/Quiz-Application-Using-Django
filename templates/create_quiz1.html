@@ -1,0 +1,139 @@
+{% extends 'base_nav.html' %}
+{% block login_active %}active{% endblock %}
+
+{% load crispy_forms_tags %}
+
+{% block body %}
+
+<style>
+
+    /* Made with love by Mutiullah Samim*/
+
+@import url('https://fonts.googleapis.com/css?family=Numans');
+
+html,body{
+background: url('http://getwallpapers.com/wallpaper/full/a/5/d/544750.jpg') no-repeat center center fixed;
+background-size: cover;
+-webkit-background-size: cover;
+-moz-background-size: cover;
+-o-background-size: cover;
+font-family: 'Numans', sans-serif;
+}
+
+#content-head{
+height: 100%;
+align-content: center;
+}
+
+.card{
+margin-top: auto;
+margin-bottom: auto;
+background-color: rgba(0,0,0,0.5) !important;
+color: white
+}
+
+.social_icon span{
+font-size: 60px;
+margin-left: 10px;
+color: #FFC312;
+}
+
+.social_icon span:hover{
+color: white;
+cursor: pointer;
+}
+
+.card-header h3{
+color: white;
+}
+
+.social_icon{
+position: absolute;
+right: 20px;
+top: -45px;
+}
+
+.input-group-prepend span{
+width: 50px;
+background-color: #FFC312;
+color: black;
+border:0 !important;
+}
+
+input:focus{
+outline: 0 0 0 0  !important;
+box-shadow: 0 0 0 0 !important;
+
+}
+
+.remember{
+color: white;
+}
+
+.remember input
+{
+width: 20px;
+height: 20px;
+margin-left: 15px;
+margin-right: 5px;
+}
+
+.login_btn{
+color: black;
+background-color: #FFC312;
+width: auto;
+}
+
+.login_btn:hover{
+color: white;
+background-color: #856f90;
+font-weight: 1000;
+}
+
+.links{
+color: white;
+}
+
+.links a{
+margin-left: 4px;
+}
+
+.text-muted {
+    color: #f8f9fab0!important;
+}
+
+.container{
+	margin-top: 50px;
+	margin-bottom: 50px;
+}
+
+</style>
+
+<div class="container" id="content-head">
+    <div class="d-flex justify-content-center h-100">
+		<div class="card" style="color:white;">
+			<div class="card-header">
+				<h3>Create Quiz</h3>
+			</div>
+			<div class="card-body">
+				<form action="" method="POST">
+						{% csrf_token %}
+                        {{ form|crispy }}
+					<div class="form-group">
+						<input type="submit" value="Submit and Proceed" class="btn float-right login_btn">
+					</div>
+				</form>
+			</div>
+			<!-- <div class="card-footer">
+				<div class="d-flex justify-content-center links">
+					Don't have an account?<a href="#">Sign Up</a>
+				</div>
+				<div class="d-flex justify-content-center">
+					<a href="#">Forgot your password?</a>
+				</div>
+			</div> -->
+		</div>
+	</div>
+</div>
+ 
+{% endblock %}

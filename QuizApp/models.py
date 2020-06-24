@@ -1,21 +1,24 @@
 from django.db import models
+import datetime
+
 from django.core.validators import (
     MaxValueValidator, validate_comma_separated_integer_list,
 )
 from django.utils.crypto import get_random_string
 from django.utils.text import slugify
 from django.db.models.signals import post_save,pre_save
+from django.contrib.auth.models import User
 
 # Create your models here.
 
 
-class CategoryManager(models.Manager):
+# class CategoryManager(models.Manager):
 
-    def new_category(self, category):
-        new_category = self.create(category=re.sub('\s+', '-', category)
-                                   .lower())
-        new_category.save()
-        return new_category
+#     def new_category(self, category):
+#         new_category = self.create(category=re.sub('\s+', '-', category)
+#                                    .lower())
+#         new_category.save()
+#         return new_category
 
 class Category(models.Model):
 
@@ -23,8 +26,6 @@ class Category(models.Model):
         verbose_name=("Category"),
         max_length=250, blank=True,
         unique=True, null=True)
-
-    objects = CategoryManager()
 
     class Meta:
         verbose_name = ("Category")
@@ -34,6 +35,10 @@ class Category(models.Model):
         return self.category
 
 class Quiz(models.Model):
+    MARKING_CHOICES = [
+    ('same', 'Same Marking for all Category'),
+    ('different', 'Different Marking for all Category'),
+    ]
 
     title = models.CharField(
         verbose_name=("Title"),
@@ -71,6 +76,8 @@ class Quiz(models.Model):
         help_text=("Percentage required to pass exam."),
         validators=[MaxValueValidator(100)])
 
+    marking = models.CharField(max_length=250, choices=MARKING_CHOICES, default='same')
+
     success_text = models.TextField(
         blank=True, help_text=("Displayed if user passes. [Optional]"),
         verbose_name=("Success Text"))
@@ -79,13 +86,17 @@ class Quiz(models.Model):
         verbose_name=("Fail Text"),
         blank=True, help_text=("Displayed if user fails. [Optional]"))
 
-    time_alloted = models.DateTimeField(
+    time_alloted = models.CharField(
+        max_length=250,
         verbose_name=("Time Alloted"),
-        blank=False, help_text=("Time to be alloted for Quiz."),
-        auto_now_add=True)
+        blank=False, help_text=("Time to be alloted for Quiz."),)
 
-    slug = models.SlugField(max_length = 250, null = True, blank = True,
-        help_text=("URL to be generated."),)
+    # time_alloted = models.TextField()
+
+    slug = models.SlugField(max_length = 250, null = True, blank = True,)
+
+    quiz_setter = models.ForeignKey(User,on_delete=models.CASCADE,default=None)
+    
 
     def save(self, force_insert=False, force_update=False, *args, **kwargs):
 
@@ -133,7 +144,7 @@ class Same_Marking(models.Model):
     neg = models.SmallIntegerField(
         blank=False, default=0,
         verbose_name=("Negative Marking"),
-        help_text=("Marks to be deducted on wrong answer. If no negative marking is opted then enter 0."),
+        help_text=("Marks to be deducted on wrong answer. If no negative marking is to be opted then enter 0."),
         validators=[MaxValueValidator(100)])
 
     def save(self, force_insert=False, force_update=False, *args, **kwargs):

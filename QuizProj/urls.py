@@ -19,7 +19,11 @@ from django.conf import settings
 from django.conf.urls.static import static
 from QuizApp import views as quizapp_views
 
+
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', quizapp_views.index,name='index')
+    path('', quizapp_views.index,name='index'),
+    path('quiz/',include('QuizApp.urls')),
+    path('',include('django.contrib.auth.urls')),
+    path('signup/',quizapp_views.SignupView.as_view(), name="signup")
 ]
