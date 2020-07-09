@@ -1,6 +1,5 @@
 from django.db import models
 import datetime
-
 from django.core.validators import (
     MaxValueValidator, validate_comma_separated_integer_list,
 )
@@ -50,7 +49,7 @@ class Quiz(models.Model):
         blank=True, help_text=("A description of the quiz. [Optional]"))
 
     category = models.ForeignKey(
-        Category, null=True, blank=True,
+        Category, null=True, blank=False,
         verbose_name=("Category"), on_delete=models.CASCADE)
 
     random_order = models.BooleanField(
@@ -147,16 +146,6 @@ class Same_Marking(models.Model):
         help_text=("Marks to be deducted on wrong answer. If no negative marking is to be opted then enter 0."),
         validators=[MaxValueValidator(100)])
 
-    def save(self, force_insert=False, force_update=False, *args, **kwargs):
-
-        if self.marks > 100 or self.neg > 100:
-            raise ValidationError("Marks entered is inappropriate")
-
-        super(Quiz, self).save(force_insert, force_update, *args, **kwargs)
-
-    def __str__(self):
-        return self.quiz
-
 class Different_Marking(models.Model):
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
     easy_marks = models.SmallIntegerField(
@@ -190,10 +179,89 @@ class Different_Marking(models.Model):
         help_text=("Marks to be deducted on wrong answer. If no negative marking is opted then enter 0."),
         validators=[MaxValueValidator(100)])
 
-    def save(self, force_insert=False, force_update=False, *args, **kwargs):
-
-        if self.easy_marks > 100 or self.easy_neg > 100 or self.medium_marks > 100 or self.medium_neg > 100 or self.hard_marks > 100 or self.hard_neg > 100:
-            raise ValidationError("Marks entered is inappropriate")
+class EasyQuestionAnwers(models.Model):
+    ANSWER_CHOICES = [
+    ('1', 'Option 1'),
+    ('2', 'Option 2'),
+    ('3', 'Option 3'),
+    ('4', 'Option 4'),
+    ]
+    quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
+    question = models.TextField(
+        verbose_name=("Question"),
+        blank=False)
+    option_1 = models.TextField(
+        verbose_name=("Type Option 1"),
+        blank=False)
+    option_2 = models.TextField(
+        verbose_name=("Type Option 2"),
+        blank=False)
+    option_3 = models.TextField(
+        verbose_name=("Type Option 3"),
+        blank=False)
+    option_4 = models.TextField(
+        verbose_name=("Type Option 4"),
+        blank=False)
+    answer = models.CharField(max_length=250, choices=ANSWER_CHOICES, default='1')
+    level = models.CharField(max_length=250, null=False, blank=False, default="easy")
 
     def __str__(self):
-        return self.quiz
+        return self.question
+
+class MediumQuestionAnwers(models.Model):
+    ANSWER_CHOICES = [
+    ('1', 'Option 1'),
+    ('2', 'Option 2'),
+    ('3', 'Option 3'),
+    ('4', 'Option 4'),
+    ]
+    quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
+    question = models.TextField(
+        verbose_name=("Question"),
+        blank=False)
+    option_1 = models.TextField(
+        verbose_name=("Type Option 1"),
+        blank=False)
+    option_2 = models.TextField(
+        verbose_name=("Type Option 2"),
+        blank=False)
+    option_3 = models.TextField(
+        verbose_name=("Type Option 3"),
+        blank=False)
+    option_4 = models.TextField(
+        verbose_name=("Type Option 4"),
+        blank=False)
+    answer = models.CharField(max_length=250, choices=ANSWER_CHOICES, default='1')
+    level = models.CharField(max_length=250, null=False, blank=False, default="medium")
+
+    def __str__(self):
+        return self.question
+
+class HardQuestionAnwers(models.Model):
+    ANSWER_CHOICES = [
+    ('1', 'Option 1'),
+    ('2', 'Option 2'),
+    ('3', 'Option 3'),
+    ('4', 'Option 4'),
+    ]
+    quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
+    question = models.TextField(
+        verbose_name=("Question"),
+        blank=False)
+    option_1 = models.TextField(
+        verbose_name=("Type Option 1"),
+        blank=False)
+    option_2 = models.TextField(
+        verbose_name=("Type Option 2"),
+        blank=False)
+    option_3 = models.TextField(
+        verbose_name=("Type Option 3"),
+        blank=False)
+    option_4 = models.TextField(
+        verbose_name=("Type Option 4"),
+        blank=False)
+    answer = models.CharField(max_length=250, choices=ANSWER_CHOICES, default='1')
+    level = models.CharField(max_length=250, null=False, blank=False, default="hard")
+
+    def __str__(self):
+        return self.question    

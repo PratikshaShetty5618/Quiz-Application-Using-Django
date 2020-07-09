@@ -1,0 +1,270 @@
+{% extends 'base_nav.html' %}
+{% block login_active %}active{% endblock %}
+
+{% load crispy_forms_tags %}
+
+{% block body %}
+<style>
+</style>
+   
+<!-- for-mobile-apps -->
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta charset="utf-8">
+
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+
+    <script>
+        addEventListener("load", function () {
+            setTimeout(hideURLbar, 0);
+        }, false);
+
+        function hideURLbar() {
+            window.scrollTo(0, 1);
+        }
+    </script>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+  <!-- //css files -->
+  
+  <!-- google fonts -->
+  <link href="//fonts.googleapis.com/css?family=Catamaran:100,200,300,400,500,600,700,800,900" rel="stylesheet">
+  <link href="//fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i,800,800i&amp;subset=cyrillic,cyrillic-ext,greek,greek-ext,latin-ext,vietnamese" rel="stylesheet">
+  <!-- //google fonts -->
+ 
+
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body {
+  font-family: Arial;
+  color: white;
+  overflow: hidden
+}
+
+.split {
+  height: 100%;
+  
+  position: fixed;
+  z-index: 1;
+  top: 0;
+  overflow-x: hidden;
+  padding-top: 20px;
+}
+
+.left {
+  margin-left: 10px;
+  
+  width: 35%;
+  left: 0;
+  background-color: white;
+}
+
+.right {
+  width: 65%;
+  /*height:40%;*/
+  right: 0;
+  /*background-image: linear-gradient(to bottom left,#00bda5,#00afb2 56%,#00a4bd); background-color: #39d87d;*/
+  background-color: #383838;
+}
+
+/* Float four columns side by side */
+.column {
+  float: left;
+  width: 97%;
+  padding: 0 10px;
+}
+
+/* Remove extra left and right margins, due to padding */
+.row {margin: auto;}
+
+/* Clear floats after the columns */
+.row:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+/* Responsive columns */
+@media screen and (max-width: 300px) {
+  .column {
+    width: 100%;
+    display: block;
+    margin-bottom: 20px;
+  }
+}
+
+/* Style the counter cards */
+.card {
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+  padding: 16px;
+  text-align: center;
+  background-color: #f1f1f1;
+  min-height: 150px;
+  
+}
+
+a:hover { 
+  color: Lightgray;
+}
+
+hr.new5 {
+  border: 10px solid white;
+  border-radius: 5px;
+  filter: blur(8px);
+  -webkit-filter: blur(8px);
+}
+
+.login_btn{
+color: black;
+background-color: #FFC312;
+width: auto;
+margin: 30px;
+}
+
+.login_btn:hover{
+color: white;
+background-color: #856f90;
+font-weight: 1000;
+}
+
+p.sticky {
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0;
+  background-color: yellow;
+  padding: 5px;
+  font-size: 20px;
+  float: right;
+  color:black;
+  margin: 5px;
+}
+</style>
+</head>
+<body>
+
+<div class="split left">
+  <center><h1 style="color: black; "> Questions List</h1></center>
+  <center>
+    {% for q in ques %}
+        {% if forloop.first %}<div class="row text-center" style="margin: 10px;">{% endif %}
+        <div class="col-lg-3 col-md-6 col-sm-6" >
+          <div class="thumbnail">
+          <div class="caption">
+            <p><a href="#{{forloop.counter}}" role="button" class="btn btn-primary btn-block" id="scroll{{forloop.counter}}">{{forloop.counter}}</a></p>
+          </div>
+        </div>
+        </div>
+        {% if forloop.counter|divisibleby:4 %}</div><div class="row text-center" style="margin: 10px;">{% endif %}
+        {% if forloop.last %}</div>{% endif %}
+    {% endfor %}
+ <!--  <table class="table table-dark table-striped" style="border-radius:0px;  width: 80%;">
+    
+    <tbody>
+      {% for q in ques %}
+      <tr>
+        <td> <a href="#{{forloop.counter}}" style="color:white;"">{{forloop.counter}}</a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table> -->
+</center>
+  
+</div>
+
+<div class="split right">
+  <p class="sticky" id="timer"></p>
+    <div class="container">
+      <h2 class="card-title" style="color:white;">{{quiz.title}}</h2>
+      <hr class="new5">
+      <div>
+
+      {% if quiz.marking == "same" %}
+      {% for q in ques %}
+        <p style="float: right; margin: 5px;">[{{marks}} marks]</p>
+        <p id="{{forloop.counter}}">{{forloop.counter}}. {{q.question}}</p>
+        <input type="radio" id="{{forloop.counter}}option1" name="{{forloop.counter}}" value="1">
+        <label for="{{forloop.counter}}option1">{{q.option_1}}</label><br>
+        <input type="radio" id="{{forloop.counter}}option2" name="{{forloop.counter}}option2" value="2">
+        <label for="{{forloop.counter}}option2">{{q.option_2}}</label><br>
+        <input type="radio" id="{{forloop.counter}}option3" name="{{forloop.counter}}option3" value="3">
+        <label for="{{forloop.counter}}option3">{{q.option_3}}</label><br>
+        <input type="radio" id="{{forloop.counter}}option4" name="{{forloop.counter}}option4" value="4">
+        <label for="{{forloop.counter}}option4">{{q.option_4}}</label>
+        <hr>
+      {% endfor %}
+      {% else %}
+      {% for q in ques %}
+        {% if q.level == "easy" %}
+        <p style="float: right; margin: 5px;">[{{easy_marks}} marks]</p>
+        {% elif q.level == "medium" %}
+        <p style="float: right; margin: 5px;">[{{medium_marks}} marks]</p>
+        {% else %}
+        <p style="float: right; margin: 5px;">[{{hard_marks}} marks]</p>
+        {% endif %}
+        <p id="{{forloop.counter}}">{{forloop.counter}}. {{q.question}}</p>
+        <input type="radio" id="{{forloop.counter}}option1" name="{{forloop.counter}}" value="1">
+        <label for="{{forloop.counter}}option1">{{q.option_1}}</label><br>
+        <input type="radio" id="{{forloop.counter}}option2" name="{{forloop.counter}}option2" value="2">
+        <label for="{{forloop.counter}}option2">{{q.option_2}}</label><br>
+        <input type="radio" id="{{forloop.counter}}option3" name="{{forloop.counter}}option3" value="3">
+        <label for="{{forloop.counter}}option3">{{q.option_3}}</label><br>
+        <input type="radio" id="{{forloop.counter}}option4" name="{{forloop.counter}}option4" value="4">
+        <label for="{{forloop.counter}}option4">{{q.option_4}}</label>
+        <hr>
+      {% endfor %}
+      {% endif %}
+      </div>
+      <center><p><a href="{% url 'index' %}" role="button" class="btn btn-primary" id ="btn_end">Submit the Quiz</a></p></center>
+    </div>
+  </div>
+<script> 
+// var hours = Number("{{hours}}");
+// var minutes = Number("{{minutes}}");
+// var seconds = Number("{{seconds}}");
+var hours = 0;
+var minutes = 1;
+var seconds = 0;
+ 
+if (seconds == 0 && minutes-1 >=0){
+  seconds = 59;
+  minutes-=1;
+}
+document.getElementById("timer").innerHTML = format_time(hours) + ":" + format_time(minutes) + ":" + format_time(seconds);
+setTimeout(function(){ document.getElementById("timer").innerHTML = format_time(hours) + ":" + format_time(minutes) + ":" + format_time(seconds); }, 1000);
+
+var x = setInterval(function() {  
+  seconds-=1;
+  if (seconds == 0 && minutes-1 >= 0){
+    seconds = 59;
+    minutes -= 1;
+  }
+  if (minutes == 0 && hours-1 >= 0){
+    minutes = 59;
+    hours -= 1;
+  }
+
+  document.getElementById("timer").innerHTML = format_time(hours) + ":" + format_time(minutes) + ":" + format_time(seconds); 
+      if (seconds == 0 && minutes == 0 && seconds == 0) {  
+          document.getElementById("btn_end").click();
+          clearInterval(x);
+      } 
+}, 1000); 
+
+function format_time(num){
+  if (num<=9) return number = "0" + String(num)
+  else return String(num)
+}
+</script>
+</body>
+</html> 
+
+{% endblock %}
+
+

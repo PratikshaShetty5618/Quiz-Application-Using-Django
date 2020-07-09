@@ -1,5 +1,5 @@
 from django import forms
-from .models import Quiz
+from .models import *
 from . import select_time_widget
 
 class QuizCreateForm(forms.ModelForm):
@@ -9,6 +9,35 @@ class QuizCreateForm(forms.ModelForm):
 		model = Quiz
 		fields = ['title','description','category','random_order','max_questions','answers_at_end','pass_mark','success_text','fail_text','time_limit']
 
+class SameMarkingCreateForm(forms.ModelForm):
+
+	class Meta:
+		model = Same_Marking
+		fields = ['marks','neg']
+
+class DifferentMarkingCreateForm(forms.ModelForm):
+
+	class Meta:
+		model = Different_Marking
+		fields = ['easy_marks','easy_neg','medium_marks','medium_neg','hard_marks','hard_neg']
+
+class EasyCreateForm(forms.ModelForm):
+
+	class Meta:
+		model = EasyQuestionAnwers
+		fields = ['question','option_1','option_2','option_3','option_4','answer']
+
+class MediumCreateForm(forms.ModelForm):
+
+	class Meta:
+		model = MediumQuestionAnwers
+		fields = ['question','option_1','option_2','option_3','option_4','answer']
+
+class HardCreateForm(forms.ModelForm):
+
+	class Meta:
+		model = HardQuestionAnwers
+		fields = ['question','option_1','option_2','option_3','option_4','answer']
 # from myapp.fields import ListTextWidget
 
 # class FormForm(forms.Form):

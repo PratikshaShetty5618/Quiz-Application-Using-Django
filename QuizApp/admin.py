@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Category,Quiz,Same_Marking,Different_Marking
+from .models import *
 
 
 # Register your models here.
@@ -14,3 +14,9 @@ admin.site.register(Quiz)
 admin.site.register(Same_Marking)
 
 admin.site.register(Different_Marking)
+
+admin.site.register(EasyQuestionAnwers)
+
+admin.site.register(MediumQuestionAnwers)
+
+admin.site.register(HardQuestionAnwers)

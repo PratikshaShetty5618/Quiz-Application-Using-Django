@@ -1,0 +1,31 @@
+{% extends 'base_nav.html' %}
+{% block login_active %}active{% endblock %}
+
+{% block body %}
+
+    <div class="container">
+            
+        <div class="jumbotron" style="margin: 20px;">
+            <h1>Welcome to Categories</h1>
+            <p>Choose the category you are ready to dive in and test your skills</p>
+
+        </div>
+        <hr>
+
+    	{% for item in categories %}
+		    {% if forloop.first %}<div class="row text-center" style="margin: 10px;">{% endif %}
+		    <div class="col-lg-3 col-md-6 col-sm-6" >
+    			<div class="thumbnail">
+					<div class="caption">
+						<h3> {{item.category}} </h3>
+						<p><a href="{% url 'category_quiz' item.category %}" role="button" class="btn btn-primary btn-block">Explore This</a></p>
+					</div>
+				</div>
+		    </div>
+		    {% if forloop.counter|divisibleby:4 %}</div><div class="row text-center" style="margin: 10px;">{% endif %}
+		    {% if forloop.last %}</div>{% endif %}
+		{% endfor %}
+
+	</div>
+<br><br>
+{% endblock %}

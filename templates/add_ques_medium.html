@@ -1,0 +1,194 @@
+{% extends 'base_nav.html' %}
+{% block login_active %}active{% endblock %}
+
+{% load crispy_forms_tags %}
+
+{% block body %}
+<style>
+</style>
+   
+<!-- for-mobile-apps -->
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta charset="utf-8">
+
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+
+    <script>
+        addEventListener("load", function () {
+            setTimeout(hideURLbar, 0);
+        }, false);
+
+        function hideURLbar() {
+            window.scrollTo(0, 1);
+        }
+    </script>
+  
+  <!-- css files -->
+
+    <link href='static/support/css/css_slider.css' rel="stylesheet"><!-- Slider css -->
+    <link href='static/support/css/bootstrap.css' rel='stylesheet' type='text/css' /><!-- bootstrap css -->
+    <link href='static/support/css/style.css' rel='stylesheet' type='text/css' /><!-- custom css -->
+    <link href='static/support/css/font-awesome.min.css' rel="stylesheet"><!-- fontawesome css -->
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+  <!-- //css files -->
+  
+  <!-- google fonts -->
+  <link href="//fonts.googleapis.com/css?family=Catamaran:100,200,300,400,500,600,700,800,900" rel="stylesheet">
+  <link href="//fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i,800,800i&amp;subset=cyrillic,cyrillic-ext,greek,greek-ext,latin-ext,vietnamese" rel="stylesheet">
+  <!-- //google fonts -->
+ 
+
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body {
+  font-family: Arial;
+  color: white;
+  overflow: hidden
+}
+
+.split {
+  height: 100%;
+  
+  position: fixed;
+  z-index: 1;
+  top: 0;
+  overflow-x: hidden;
+  padding-top: 20px;
+}
+
+.left {
+  margin-left: 10px;
+  
+  width: 35%;
+  left: 0;
+  background-color: white;
+}
+
+.right {
+  width: 65%;
+  /*height:40%;*/
+  right: 0;
+  /*background-image: linear-gradient(to bottom left,#00bda5,#00afb2 56%,#00a4bd); background-color: #39d87d;*/
+  background-color: #383838;
+}
+
+/* Float four columns side by side */
+.column {
+  float: left;
+  width: 97%;
+  padding: 0 10px;
+}
+
+/* Remove extra left and right margins, due to padding */
+.row {margin: auto;}
+
+/* Clear floats after the columns */
+.row:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+/* Responsive columns */
+@media screen and (max-width: 300px) {
+  .column {
+    width: 100%;
+    display: block;
+    margin-bottom: 20px;
+  }
+}
+
+/* Style the counter cards */
+.card {
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+  padding: 16px;
+  text-align: center;
+  background-color: #f1f1f1;
+  min-height: 150px;
+  
+}
+
+a:hover { 
+  color: Lightgray;
+}
+
+hr.new5 {
+  border: 10px solid white;
+  border-radius: 5px;
+  filter: blur(8px);
+  -webkit-filter: blur(8px);
+}
+
+.login_btn{
+color: black;
+background-color: #FFC312;
+width: auto;
+margin: 30px;
+}
+
+.login_btn:hover{
+color: white;
+background-color: #856f90;
+font-weight: 1000;
+}
+</style>
+</head>
+<body>
+
+<div class="split left">
+  <center><h1 style="color: black; ">Medium Questions List</h1></center>
+  <center>
+  <table class="table table-dark table-striped" style="border-radius:0px;  width: 80%;">
+    
+    <tbody>
+      {% for ques in medium_ques %}
+
+      <tr>
+        {% if ques.question|length <= 130 %}
+        <td> <a href="{% url 'medium_ques_update' ques.pk %}" style="color:white;"">{{ques.question}}</a></td>
+    	{% else %}
+    	<td> <a href="{% url 'medium_ques_update' ques.pk %}" style="color:white;"">{{ques.question | slice:":130"}}</a>....</td>
+    	{% endif %}
+    
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</center>
+  
+</div>
+
+<div class="split right">
+   <center>
+  		<div class="container">
+  			<h2 class="card-title" style="color:white;">Add Medium Question</h2><hr class="new5">
+  			<form action="" method="POST">
+					{% csrf_token %}
+                    {{ form|crispy }}
+				<div class="form-group">
+					<a href="{% url 'update_quiz1' request.session.quiz %}"><button type="button" class="btn float-left login_btn"> Back </button></a>
+					<input type="submit" value="Save and next" class="btn float-left login_btn">
+					<a href="{% url 'hard_ques' %}"><button type="button" class="btn float-right login_btn"> Proceed to Hard Level Questions </button></a>
+					
+				</div>
+			</form>
+	    </div>
+					
+</center>
+</div>
+     
+</body>
+</html> 
+
+{% endblock %}
+
+

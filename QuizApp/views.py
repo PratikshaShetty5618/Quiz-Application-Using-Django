@@ -1,11 +1,15 @@
 from django.shortcuts import render,redirect,render_to_response,get_object_or_404
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from django.views.generic import ListView,DetailView
+from django.views.generic.base import View
 from django.contrib.auth.forms import UserCreationForm
 from django.urls import reverse_lazy
-from .models import Quiz,Same_Marking
+from .models import *
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
-from .forms import QuizCreateForm
+from django import forms
+from .forms import *
+import random
 
 # Create your views here.
 
@@ -32,65 +36,318 @@ class CreateQuiz1(LoginRequiredMixin,CreateView):
 
 
 class UpdateQuiz1(LoginRequiredMixin,UpdateView):
-    model = Quiz
-    fields = ['title','description','category','random_order','max_questions','answers_at_end','pass_mark','marking','success_text','fail_text','time_alloted']
-    # fields = '__all__'
+    form_class = QuizCreateForm
     template_name = 'create_quiz1.html'
+    model = Quiz
     
     def form_valid(self, form): 
         instance = form.save(commit=False)
+        instance.time_alloted = form.cleaned_data.get('time_limit')
         instance.quiz_setter = self.request.user
+        instance.save()
         self.request.session['quiz'] = instance.pk
+        query = Quiz.objects.get(id=self.request.session['quiz'])
+        if 'same' == query.marking:
+        	exist_query = Same_Marking.objects.get(quiz = query)
+        	if exist_query:
+        		return redirect('update_quiz2', id=exist_query.pk)
+        else:
+        	exist_query = Different_Marking.objects.get(quiz = query)
+        	if exist_query:
+        		return redirect('update_quiz2', id=exist_query.pk)
         return redirect('create_quiz2')
 
-class CreateQuiz2(LoginRequiredMixin,CreateView):
-	model = Same_Marking
-	fields = ['marks','neg']
-	template_name = 'create_quiz2.html'
+@login_required
+def create_quiz2(request):
+	query = Quiz.objects.get(id=request.session['quiz'])
+	if 'same' == query.marking:
+		if (request.method == 'POST'):
+			form = SameMarkingCreateForm(request.POST)
+			if (form.is_valid()):
+				instance = form.save(commit=False)
+				instance.quiz = query
+				instance.save()
+				return redirect('easy_ques')
+		else:
+			form = SameMarkingCreateForm()
+	else:
+		if (request.method == 'POST'):
+			form = DifferentMarkingCreateForm(request.POST)
+			if (form.is_valid()):
+				instance = form.save(commit=False)
+				instance.quiz = query
+				instance.save()
+				return redirect('easy_ques')
+		else:
+			form = DifferentMarkingCreateForm()
+	return render(request, 'create_quiz2.html', {'form': form})
+
+@login_required
+def update_quiz2(request, id):
+	query = Quiz.objects.get(id=request.session['quiz'])
+	if 'same' == query.marking:
+	    instance = get_object_or_404(Same_Marking, id=id)
+	    form = SameMarkingCreateForm(request.POST or None, instance=instance)
+	    if form.is_valid():
+	    	instance = form.save(commit=False)
+	    	instance.quiz = query
+	    	form.save()
+	    	return redirect('easy_ques')
+	else:
+		instance = get_object_or_404(Different_Marking, id=id)
+		form = DifferentMarkingCreateForm(request.POST or None, instance=instance)
+		if form.is_valid():
+			instance = form.save(commit=False)
+			instance.quiz = query
+			form.save()
+			return redirect('easy_ques')
+	return render(request, 'create_quiz2.html', {'form': form}) 
+
+class CreateEasyQuiz(LoginRequiredMixin,CreateView):
+	form_class = EasyCreateForm
+	template_name = 'add_ques_easy.html'
+
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		quiz = Quiz.objects.get(id=self.request.session['quiz'],quiz_setter = self.request.user)
+		context['easy_ques'] = EasyQuestionAnwers.objects.filter(quiz=quiz)
+		return context
 
 	def form_valid(self, form):
-		instance = form.save(commit=False)
-		quiz = Quiz.objects.get(id=self.request.session['quiz'])
-		instance.quiz = quiz
+		instance = form.save(commit = False)
+		instance.quiz = Quiz.objects.get(id=self.request.session['quiz'])
 		instance.save()
-		return redirect('create_quiz2')
+		return redirect('easy_ques')
+
+class UpdateEasyQuiz(LoginRequiredMixin,UpdateView):
+	form_class = EasyCreateForm
+	template_name = 'add_ques_easy.html'
+	model = EasyQuestionAnwers
+
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		quiz = Quiz.objects.get(id=self.request.session['quiz'],quiz_setter = self.request.user)
+		context['easy_ques'] = EasyQuestionAnwers.objects.filter(quiz=quiz)
+		return context
+
+	def form_valid(self, form): 
+		instance = form.save(commit = False)
+		instance.quiz = Quiz.objects.get(id=self.request.session['quiz'])
+		instance.save()
+		return redirect('easy_ques')
+
+class CreateMediumQuiz(LoginRequiredMixin,CreateView):
+	form_class = MediumCreateForm
+	template_name = 'add_ques_medium.html'
+
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		quiz = Quiz.objects.get(id=self.request.session['quiz'],quiz_setter = self.request.user)
+		context['medium_ques'] = MediumQuestionAnwers.objects.filter(quiz=quiz)
+		return context
+
+	def form_valid(self, form):
+		instance = form.save(commit = False)
+		instance.quiz = Quiz.objects.get(id=self.request.session['quiz'])
+		instance.save()
+		return redirect('medium_ques')
+
+class UpdateMediumQuiz(LoginRequiredMixin,UpdateView):
+    form_class = MediumCreateForm
+    template_name = 'add_ques_medium.html'
+    model = MediumQuestionAnwers
+
+    def get_context_data(self, **kwargs):
+    	context = super().get_context_data(**kwargs)
+    	quiz = Quiz.objects.get(id=self.request.session['quiz'],quiz_setter = self.request.user)
+    	context['medium_ques'] = MediumQuestionAnwers.objects.filter(quiz=quiz)
+    	return context
+
+    def form_valid(self, form):
+    	instance = form.save(commit = False)
+    	instance.quiz = Quiz.objects.get(id=self.request.session['quiz'])
+    	instance.save()
+    	return redirect('medium_ques')
+
+class CreateHardQuiz(LoginRequiredMixin,CreateView):
+	form_class = HardCreateForm
+	template_name = 'add_ques_hard.html'
+
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		quiz = Quiz.objects.get(id=self.request.session['quiz'],quiz_setter = self.request.user)
+		context['hard_ques'] = HardQuestionAnwers.objects.filter(quiz=quiz)
+		return context
+
+	def form_valid(self, form):
+		instance = form.save(commit = False)
+		instance.quiz = Quiz.objects.get(id=self.request.session['quiz'])
+		instance.save()
+		return redirect('hard_ques')
+
+class UpdateHardQuiz(LoginRequiredMixin,UpdateView):
+	form_class = HardCreateForm
+	template_name = 'add_ques_hard.html'
+	model = HardQuestionAnwers
+
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		quiz = Quiz.objects.get(id=self.request.session['quiz'],quiz_setter = self.request.user)
+		context['hard_ques'] = HardQuestionAnwers.objects.filter(quiz=quiz)
+		return context
+
+	def form_valid(self, form):
+		instance = form.save(commit = False)
+		instance.quiz = Quiz.objects.get(id=self.request.session['quiz'])
+		instance.save()
+		return redirect('hard_ques')
+
+class CategoryList(ListView):
+    template_name = 'categories.html'
+    model = Category
+    context_object_name = 'categories' #Context name used in template
+
+class CategoryQuiz(View):
+	def get(self,request,*args,**kwargs):
+		category = Category.objects.filter(category = kwargs['category'])
+		quiz = Quiz.objects.filter(category = category[0]).values()
+		context = {}
+		context['category_quiz'] = quiz
+		context['category'] = kwargs['category']
+		return render(request, 'category_quiz.html', context)
+
+class QuizDetail(View):
+	def get(self,request,*args,**kwargs):
+		quiz = Quiz.objects.filter(slug = kwargs['slug'])[0]
+		context = {}
+		context['ques_count'] = quiz_actual_question_count(quiz)
+		context['quiz'] = quiz
+		if quiz.marking == 'same':
+			par = marks_n_level(quiz)
+			total_marks,neg_marks = par[-1],par[-2]
+			context['neg_marks'] = neg_marks
+		else:
+			par = marks_n_level(quiz)[-1]
+			total_marks,easy_neg_marks,medium_neg_marks,hard_neg_marks = par[-1],par[-4],par[-3],par[-2]
+			context['easy_neg_marks'] = easy_neg_marks
+			context['medium_neg_marks'] = medium_neg_marks
+			context['hard_neg_marks'] = hard_neg_marks
+		context['pass_marks'] = total_marks * quiz.pass_mark / 100
+		context['total_marks'] = total_marks
+		time = quiz.time_alloted.split(':')
+		context['hours'] = time[0]
+		context['minutes'] = time[1]
+		context['seconds'] = time[2]
+		return render(request, 'quiz_detail.html', context)
+
+def quiz_actual_question_count(quiz):
+	easy_ques_count = len(EasyQuestionAnwers.objects.filter(quiz=quiz))
+	medium_ques_count = len(MediumQuestionAnwers.objects.filter(quiz=quiz))
+	hard_ques_count = len(HardQuestionAnwers.objects.filter(quiz=quiz))
+	ques_count = easy_ques_count + medium_ques_count + hard_ques_count
+	if ques_count<=quiz.max_questions:
+		return ques_count
+	else:
+		return quiz.max_questions
+	
+def marks_n_level(quiz):
+	ques_count = quiz_actual_question_count(quiz)
+
+	hard = HardQuestionAnwers.objects.filter(quiz=quiz)
+	if ques_count//3 < hard.count():
+		hard_count = ques_count//3
+	else:
+		hard_count = hard.count()
+
+	medium = MediumQuestionAnwers.objects.filter(quiz = quiz)
+	if (ques_count - hard_count)//2 < medium.count():
+		medium_count = (ques_count - hard_count)//2
+	else:
+		medium_count = medium.count()
+
+	easy = EasyQuestionAnwers.objects.filter(quiz = quiz)
+	if (ques_count - medium_count - hard_count ) < easy.count():
+		easy_count = (ques_count - medium_count - hard_count)
+	else:
+		easy_count = easy.count()
+
+	while easy_count + medium_count + hard_count < ques_count:
+		if medium_count != medium.count():
+			if (ques_count - (easy_count + medium_count + hard_count)) <= (medium.count() - medium_count):
+				medium_count +=  ques_count - (easy_count + medium_count + hard_count)
+			elif ques_count - (easy_count + medium_count + hard_count) > medium.count()-medium_count:
+				medium_count += medium.count()-medium_count
+				if ques_count - (easy_count + medium_count + hard_count) <= hard.count()-hard_count:
+					hard_count += ques_count - (easy_count + medium_count + hard_count)
+				elif ques_count - (easy_count + medium_count + hard_count) > hard.count()-hard_count:
+					hard_count += hard.count()
+		elif hard_count != hard.count():
+			if ques_count - (easy_count + medium_count + hard_count) <= hard.count()-hard_count:
+				hard_count += ques_count - (easy_count + medium_count + hard_count)
+			elif ques_count - (easy_count + medium_count + hard_count) > hard.count()-hard_count:
+				hard_count += hard.count()
+
+	if 'same'== quiz.marking:
+		query_marks = Same_Marking.objects.get(quiz = quiz)
+		marks = query_marks.marks
+		neg_marks = query_marks.neg
+		total_marks = ques_count * marks
+		return (easy_count,medium_count,hard_count,marks,neg_marks,total_marks)
+	else:
+		query_marks = Different_Marking.objects.get(quiz = quiz)
+		easy_marks = query_marks.easy_marks
+		easy_neg_marks = query_marks.easy_neg
+		medium_marks = query_marks.medium_marks
+		medium_neg_marks = query_marks.medium_neg
+		hard_marks = query_marks.hard_marks
+		hard_neg_marks = query_marks.hard_neg
+		total_marks = easy_count * easy_marks + medium_count * medium_marks + hard_count * hard_marks
+		return (easy_count,medium_count,hard_count,easy_marks,medium_marks,hard_marks,easy_neg_marks,medium_neg_marks,hard_neg_marks,total_marks)
+
+class QuizQuestions(View):
+	def get(self,request,*args,**kwargs):
+		quiz = Quiz.objects.filter(slug = kwargs['slug'])[0]
+		context = {}
+
+		if quiz.marking == 'same':
+			easy_count,medium_count,hard_count,marks,neg_marks,total_marks = marks_n_level(quiz)
+			context['marks'] = marks
+			context['neg_marks'] = neg_marks
+		else:
+			easy_count,medium_count,hard_count,easy_marks,medium_marks,hard_marks,easy_neg_marks,medium_neg_marks,hard_neg_marks,total_marks = marks_n_level(quiz)
+			context['easy_marks'] = easy_marks
+			context['medium_marks'] = medium_marks
+			context['hard_marks'] = hard_marks
+			context['easy_neg_marks'] = easy_neg_marks
+			context['medium_neg_marks'] = medium_neg_marks
+			context['hard_neg_marks'] = hard_neg_marks
+			
+		ques_count = quiz_actual_question_count(quiz)
+
+		easy_ques = random_ques_list(quiz,EasyQuestionAnwers,easy_count)
+		medium_ques = random_ques_list(quiz,MediumQuestionAnwers,medium_count)
+		hard_ques = random_ques_list(quiz,HardQuestionAnwers,hard_count)
+
+		ques_merge = easy_ques + medium_ques + hard_ques
+		random.shuffle(ques_merge)
 		
-# def test(request):
-#     from .forms import QuizCreateForm
-    
-#     if request.method == 'POST':
-#         form = QuizCreateForm(request.POST)
-#         if form.is_valid():
-#             info = form.cleaned_data('time_limit')
-#             print(info)
-#     else:
-#         form = QuizCreateForm()
+		context['quiz'] = quiz
+		context['ques'] = ques_merge
+		time = quiz.time_alloted.split(':')
+		context['hours'] = time[0]
+		context['minutes'] = time[1]
+		context['seconds'] = time[2]
 
-        
-#     return render(request,'create_quiz1.html',{})	
+		return render(request, 'quiz.html', context)
 
-
-# class TestView(CreateView):
-#     form_class = QuizCreateForm
-#     template_name = 'create_quiz1.html'
-#     success_url = reverse_lazy('create_quiz2')
-
-#     def form_valid(self,form):
-#         self.object = form.save(commit = False)
-#         time = form.cleaned_data.get('time_limit')
-        
-#         # email = form.cleaned_data.get('email')
-#         # invite_code_check = InviteCode.objects.filter(email=email,code=invite_code,status="False")
-#         # if invite_code_check.exists():
-#         #     invite_code_check.update(status="True")
-#         #     self.object.save()
-#         #     raw_password = form.cleaned_data.get('password1')
-#         #     user = authenticate(username=self.object.username, password=raw_password)
-#         #     login(self.request, user)
-#         #     messages.success(self.request, 'Your account has been successfully created and you have been logged in!')
-#         #     return redirect('index')
-#         html = "<html><body>Invite Code is not proper. Please Try Again. </body></html>"
-#         return HttpResponse(html)
+def random_ques_list(quiz,mod,count):
+	query = mod.objects.filter(quiz = quiz)
+	ques = []
+	while(len(ques)<count):
+		choice =  random.randint(0, query.count()-1)
+		if query[choice] not in ques:
+			ques.append(query[choice])
+	return ques
 
 # from myapp.forms import FormForm
 

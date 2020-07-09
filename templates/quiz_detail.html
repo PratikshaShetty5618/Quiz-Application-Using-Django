@@ -1,0 +1,42 @@
+{% extends 'base_nav.html' %}
+{% block login_active %}active{% endblock %}
+
+{% block body %}
+
+    <div class="container">    
+        <div class="jumbotron" style="margin: 10px;">
+            <h1>{{quiz.title}}</h1><br>
+ 			<p><b>Description about the test: </b>{{quiz.description}}</p>
+ 			<p><b>Category Chosen: </b>{{quiz.category}}</p>
+ 			<p><b>Questions to be attempted: </b>{{ques_count}}</p>
+ 			<p><b>Passing percentage: </b>{{quiz.pass_mark}}% (i.e. {{pass_marks}} out of {{total_marks}})</p>
+ 			{% if quiz.marking == "same" %}
+ 			{% if neg_marks == 0 %}
+ 			<p><b>Negative Marking: </b>No </p>
+ 			{% else %}
+ 			<p><b>Negative Marking: </b>{{neg_marks}}</p>
+ 			{% endif %}
+ 			{% else %}
+ 			{% if easy_neg_marks == 0 %}
+ 			<p><b>Negative Marking for Easy Level Questions: </b>No </p>
+ 			{% else %}
+ 			<p><b>Negative Marking for Easy Level Questions: </b>{{easy_neg_marks}}</p>
+ 			{% endif %}
+ 			{% if medium_neg_marks == 0 %}
+ 			<p><b>Negative Marking for Medium Level Questions: </b>No </p>
+ 			{% else %}
+ 			<p><b>Negative Marking for Medium Level Questions: </b>{{medium_neg_marks}}</p>
+ 			{% endif %}
+ 			{% if hard_neg_marks == 0 %}
+ 			<p><b>Negative Marking for Hard Level Questions: </b>No </p>
+ 			{% else %}
+ 			<p><b>Negative Marking for Hard Level Questions: </b>{{hard_neg_marks}}</p>
+ 			{% endif %}
+ 			{% endif %}
+ 			<p><b>Time alloted: </b>{{quiz.time_alloted}} ( i.e. {% if hours != "00" %}{{hours}} hours {% endif %}{% if minutes != "00" %}{{minutes}} minutes {% endif %}{% if seconds != "00" %}{{seconds}} seconds {% endif %})</p>
+ 			<center><p><a href="{% url 'quiz_ques' quiz.slug %}" role="button" class="btn btn-primary ">Start the Quiz</a></p></center>
+        </div>
+	</div>
+
+<br><br>
+{% endblock %}
