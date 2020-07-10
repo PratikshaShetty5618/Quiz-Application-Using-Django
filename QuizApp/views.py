@@ -1,4 +1,5 @@
 from django.shortcuts import render,redirect,render_to_response,get_object_or_404
+from django.http import HttpResponse
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic import ListView,DetailView
 from django.views.generic.base import View
@@ -10,6 +11,8 @@ from django.contrib.auth.decorators import login_required
 from django import forms
 from .forms import *
 import random
+import json
+
 
 # Create your views here.
 
@@ -309,6 +312,8 @@ class QuizQuestions(View):
 		quiz = Quiz.objects.filter(slug = kwargs['slug'])[0]
 		context = {}
 
+		context['ques_count'] = quiz_actual_question_count(quiz)
+
 		if quiz.marking == 'same':
 			easy_count,medium_count,hard_count,marks,neg_marks,total_marks = marks_n_level(quiz)
 			context['marks'] = marks
@@ -348,6 +353,36 @@ def random_ques_list(quiz,mod,count):
 		if query[choice] not in ques:
 			ques.append(query[choice])
 	return ques
+
+def quiz_submit(request,slug):
+   if request.method == 'GET':
+       ## access you data by playing around with the request.POST object
+       quiz = Quiz.objects.get(slug = slug)
+       answers = request.GET.getlist('answers[]')
+       marks = request.GET.getlist('marks[]')
+       neg_marks = request.GET.getlist('neg_marks[]')
+       user_answers = request.GET.getlist('user_answers[]')
+       ques_count = quiz_actual_question_count(quiz)
+       achieved_marks = 0
+       for i in range(0,ques_count):
+       	if answers[i] == user_answers[i]:
+       		achieved_marks+=int(marks[i])
+       	else:
+       		achieved_marks-=int(neg_marks[i])
+       context = {}
+       context['achieved_marks'] = achieved_marks
+       total_marks = marks_n_level(quiz)[-1]
+       pass_marks = total_marks * quiz.pass_mark / 100
+       context['pass_marks'] = pass_marks
+       context['total_marks'] = total_marks
+       if achieved_marks >= pass_marks:
+       	context['result'] = "Pass"
+       else:
+       	context['result'] = "Fail"
+       return render(request,'temp.html',context)
+
+   elif request.method == 'POST':
+       return HttpResponse("There's some problem whle submission. Do try again later!!!")
 
 # from myapp.forms import FormForm
 

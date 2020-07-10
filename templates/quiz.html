@@ -26,9 +26,37 @@
         function hideURLbar() {
             window.scrollTo(0, 1);
         }
+        function getCookie(name) {
+          var cookieValue = null;
+          if (document.cookie && document.cookie != '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+              var cookie = jQuery.trim(cookies[i]);
+              // Does this cookie string begin with the name we want?
+              if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                  cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                  break;
+              }
+            }
+          }
+          return cookieValue;
+        }
+
+        var csrftoken = getCookie('csrftoken');
+        function csrfSafeMethod(method) {
+           return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+        }
+
+        $.ajaxSetup({
+            beforeSend: function(xhr, settings) {
+               if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                   xhr.setRequestHeader("X-CSRFToken", csrftoken);
+             }
+          }
+        });
     </script>
-    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-  <!-- //css files -->
+<!--     <script src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
+ -->  <!-- //css files -->
   
   <!-- google fonts -->
   <link href="//fonts.googleapis.com/css?family=Catamaran:100,200,300,400,500,600,700,800,900" rel="stylesheet">
@@ -41,6 +69,10 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<script type="text/javascript">
+  var marks = [];
+  var neg_marks = []
+</script>
 <style>
 body {
   font-family: Arial;
@@ -164,16 +196,6 @@ p.sticky {
         {% if forloop.counter|divisibleby:4 %}</div><div class="row text-center" style="margin: 10px;">{% endif %}
         {% if forloop.last %}</div>{% endif %}
     {% endfor %}
- <!--  <table class="table table-dark table-striped" style="border-radius:0px;  width: 80%;">
-    
-    <tbody>
-      {% for q in ques %}
-      <tr>
-        <td> <a href="#{{forloop.counter}}" style="color:white;"">{{forloop.counter}}</a></td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table> -->
 </center>
   
 </div>
@@ -188,14 +210,18 @@ p.sticky {
       {% if quiz.marking == "same" %}
       {% for q in ques %}
         <p style="float: right; margin: 5px;">[{{marks}} marks]</p>
+        <script type="text/javascript">
+          marks.push(Number("{{marks}}"));
+          neg_marks.push(Number("{{neg_marks}}"));
+        </script>
         <p id="{{forloop.counter}}">{{forloop.counter}}. {{q.question}}</p>
         <input type="radio" id="{{forloop.counter}}option1" name="{{forloop.counter}}" value="1">
         <label for="{{forloop.counter}}option1">{{q.option_1}}</label><br>
-        <input type="radio" id="{{forloop.counter}}option2" name="{{forloop.counter}}option2" value="2">
+        <input type="radio" id="{{forloop.counter}}option2" name="{{forloop.counter}}" value="2">
         <label for="{{forloop.counter}}option2">{{q.option_2}}</label><br>
-        <input type="radio" id="{{forloop.counter}}option3" name="{{forloop.counter}}option3" value="3">
+        <input type="radio" id="{{forloop.counter}}option3" name="{{forloop.counter}}" value="3">
         <label for="{{forloop.counter}}option3">{{q.option_3}}</label><br>
-        <input type="radio" id="{{forloop.counter}}option4" name="{{forloop.counter}}option4" value="4">
+        <input type="radio" id="{{forloop.counter}}option4" name="{{forloop.counter}}" value="4">
         <label for="{{forloop.counter}}option4">{{q.option_4}}</label>
         <hr>
       {% endfor %}
@@ -203,34 +229,46 @@ p.sticky {
       {% for q in ques %}
         {% if q.level == "easy" %}
         <p style="float: right; margin: 5px;">[{{easy_marks}} marks]</p>
+        <script type="text/javascript">
+          marks.push(Number("{{easy_marks}}"));
+          neg_marks.push(Number("{{easy_neg_marks}}"));
+        </script>
         {% elif q.level == "medium" %}
         <p style="float: right; margin: 5px;">[{{medium_marks}} marks]</p>
+        <script type="text/javascript">
+          marks.push(Number("{{medium_marks}}"));
+          neg_marks.push(Number("{{medium_neg_marks}}"));
+        </script>
         {% else %}
         <p style="float: right; margin: 5px;">[{{hard_marks}} marks]</p>
+        <script type="text/javascript">
+          marks.push(Number("{{hard_marks}}"));
+          neg_marks.push(Number("{{hard_neg_marks}}"));
+        </script>
         {% endif %}
         <p id="{{forloop.counter}}">{{forloop.counter}}. {{q.question}}</p>
         <input type="radio" id="{{forloop.counter}}option1" name="{{forloop.counter}}" value="1">
         <label for="{{forloop.counter}}option1">{{q.option_1}}</label><br>
-        <input type="radio" id="{{forloop.counter}}option2" name="{{forloop.counter}}option2" value="2">
+        <input type="radio" id="{{forloop.counter}}option2" name="{{forloop.counter}}" value="2">
         <label for="{{forloop.counter}}option2">{{q.option_2}}</label><br>
-        <input type="radio" id="{{forloop.counter}}option3" name="{{forloop.counter}}option3" value="3">
+        <input type="radio" id="{{forloop.counter}}option3" name="{{forloop.counter}}" value="3">
         <label for="{{forloop.counter}}option3">{{q.option_3}}</label><br>
-        <input type="radio" id="{{forloop.counter}}option4" name="{{forloop.counter}}option4" value="4">
+        <input type="radio" id="{{forloop.counter}}option4" name="{{forloop.counter}}" value="4">
         <label for="{{forloop.counter}}option4">{{q.option_4}}</label>
         <hr>
       {% endfor %}
       {% endif %}
       </div>
-      <center><p><a href="{% url 'index' %}" role="button" class="btn btn-primary" id ="btn_end">Submit the Quiz</a></p></center>
+      <center><p role="button" class="btn btn-primary" id ="btn_end" onclick="answer_submit()">Submit the Quiz</p></center>
     </div>
   </div>
 <script> 
-// var hours = Number("{{hours}}");
-// var minutes = Number("{{minutes}}");
-// var seconds = Number("{{seconds}}");
-var hours = 0;
-var minutes = 1;
-var seconds = 0;
+var hours = Number("{{hours}}");
+var minutes = Number("{{minutes}}");
+var seconds = Number("{{seconds}}");
+// var hours = 0;
+// var minutes = 1;
+// var seconds = 0;
  
 if (seconds == 0 && minutes-1 >=0){
   seconds = 59;
@@ -258,9 +296,57 @@ var x = setInterval(function() {
 }, 1000); 
 
 function format_time(num){
-  if (num<=9) return number = "0" + String(num)
-  else return String(num)
+  if (num<=9) return number = "0" + String(num);
+  else return String(num);
 }
+
+var answers = [];
+{% for i in ques %}
+  answers.push(Number("{{i.answer}}"));
+{% endfor %}
+
+console.log(answers);
+console.log(marks);
+console.log(neg_marks);
+
+function answer_submit(){
+  var user_answers = [];
+  var answer_store = [];
+  {% for i in ques %}
+    answer_store.push(document.getElementsByName("{{forloop.counter}}"));
+  {% endfor %}
+  for (var ele=0; ele< answer_store.length ;ele++){
+    flag = true;
+    for(var i = 0; i < answer_store[ele].length; i++) { 
+                if(answer_store[ele][i].checked){ 
+                  user_answers.push(Number(answer_store[ele][i].value));
+                  flag = false;
+                }
+                
+            }
+            if(flag) user_answers.push(0);
+  }
+  console.log(user_answers)
+
+  $.get('/quiz/quiz_submit/'+"{{quiz.slug}}", {'answers' : answers, 'marks': marks, 'neg_marks':neg_marks, 'user_answers': user_answers},function(data){$('body').html(data);});
+
+//   $.ajax({
+//     // points to the url where your data will be posted
+//     url:'/quiz/quiz_submit/'+"{{quiz.slug}}",
+//     // post for security reason
+//     type: "POST",
+//     contentType: 'application/json',
+//     // data that you will like to return 
+//     data: JSON.stringify({'answers' : answers, 'marks': marks, 'neg_marks':neg_marks, 'user_answers': user_answers, 'csrfmiddlewaretoken': '{{csrf_token}}'}),
+//     // what to do when the call is success 
+//     success:function(data){console.log(data);},
+//     // what to do when the call is complete ( you can right your clean from code here)
+//     complete:function(){},
+//     // what to do when there is an error
+//     error:function (xhr, textStatus, thrownError){console.log(thrownError);}
+// });
+}
+
 </script>
 </body>
 </html> 
