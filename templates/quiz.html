@@ -189,7 +189,7 @@ p.sticky {
         <div class="col-lg-3 col-md-6 col-sm-6" >
           <div class="thumbnail">
           <div class="caption">
-            <p><a href="#{{forloop.counter}}" role="button" class="btn btn-primary btn-block" id="scroll{{forloop.counter}}">{{forloop.counter}}</a></p>
+            <p><a href="#{{forloop.counter}}" role="button" class="btn btn-danger btn-block" id="scroll{{forloop.counter}}">{{forloop.counter}}</a></p>
           </div>
         </div>
         </div>
@@ -293,6 +293,23 @@ var x = setInterval(function() {
           document.getElementById("btn_end").click();
           clearInterval(x);
       } 
+  temp = []
+  {% for i in ques %}
+    temp.push(document.getElementsByName("{{forloop.counter}}"));
+  {% endfor %}
+  for (var ele=0; ele< temp.length ;ele++){
+    flag = true;
+    for(var i = 0; i < temp[ele].length; i++) { 
+                if(temp[ele][i].checked){ 
+                  flag = false;
+                }
+                
+            }
+            if(flag == false){
+              document.getElementById("scroll"+String(ele+1)).classList.remove('btn-danger');
+              document.getElementById("scroll"+String(ele+1)).classList.add('btn-success');
+            } 
+  }
 }, 1000); 
 
 function format_time(num){
