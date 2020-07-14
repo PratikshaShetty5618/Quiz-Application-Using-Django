@@ -38,6 +38,12 @@ class HardCreateForm(forms.ModelForm):
 	class Meta:
 		model = HardQuestionAnwers
 		fields = ['question','option_1','option_2','option_3','option_4','answer']
+
+class UserDetailForm(forms.ModelForm):
+
+	class Meta:
+		model = User_Detail
+		fields = ['name','email']
 # from myapp.fields import ListTextWidget
 
 # class FormForm(forms.Form):

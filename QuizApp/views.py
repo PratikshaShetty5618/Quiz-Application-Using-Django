@@ -11,14 +11,20 @@ from django.contrib.auth.decorators import login_required
 from django import forms
 from .forms import *
 import random
-import json
+from django.utils.timezone import utc
+import math
 
 
 # Create your views here.
 
 def index(request):
-	context = {}
-	return render(request, 'index.html', context)
+	try:
+		del request.session['quiz']
+	except:
+		pass
+	finally:
+		context = {}
+		return render(request, 'index.html', context)
 
 class SignupView(CreateView):
     form_class = UserCreationForm
@@ -309,41 +315,45 @@ def marks_n_level(quiz):
 
 class QuizQuestions(View):
 	def get(self,request,*args,**kwargs):
-		quiz = Quiz.objects.filter(slug = kwargs['slug'])[0]
-		context = {}
+		try:
+			request.session['id']
+			quiz = Quiz.objects.filter(slug = kwargs['slug'])[0]
+			context = {}
 
-		context['ques_count'] = quiz_actual_question_count(quiz)
+			context['ques_count'] = quiz_actual_question_count(quiz)
 
-		if quiz.marking == 'same':
-			easy_count,medium_count,hard_count,marks,neg_marks,total_marks = marks_n_level(quiz)
-			context['marks'] = marks
-			context['neg_marks'] = neg_marks
-		else:
-			easy_count,medium_count,hard_count,easy_marks,medium_marks,hard_marks,easy_neg_marks,medium_neg_marks,hard_neg_marks,total_marks = marks_n_level(quiz)
-			context['easy_marks'] = easy_marks
-			context['medium_marks'] = medium_marks
-			context['hard_marks'] = hard_marks
-			context['easy_neg_marks'] = easy_neg_marks
-			context['medium_neg_marks'] = medium_neg_marks
-			context['hard_neg_marks'] = hard_neg_marks
+			if quiz.marking == 'same':
+				easy_count,medium_count,hard_count,marks,neg_marks,total_marks = marks_n_level(quiz)
+				context['marks'] = marks
+				context['neg_marks'] = neg_marks
+			else:
+				easy_count,medium_count,hard_count,easy_marks,medium_marks,hard_marks,easy_neg_marks,medium_neg_marks,hard_neg_marks,total_marks = marks_n_level(quiz)
+				context['easy_marks'] = easy_marks
+				context['medium_marks'] = medium_marks
+				context['hard_marks'] = hard_marks
+				context['easy_neg_marks'] = easy_neg_marks
+				context['medium_neg_marks'] = medium_neg_marks
+				context['hard_neg_marks'] = hard_neg_marks
+				
+			ques_count = quiz_actual_question_count(quiz)
+
+			easy_ques = random_ques_list(quiz,EasyQuestionAnwers,easy_count)
+			medium_ques = random_ques_list(quiz,MediumQuestionAnwers,medium_count)
+			hard_ques = random_ques_list(quiz,HardQuestionAnwers,hard_count)
+
+			ques_merge = easy_ques + medium_ques + hard_ques
+			random.shuffle(ques_merge)
 			
-		ques_count = quiz_actual_question_count(quiz)
+			context['quiz'] = quiz
+			context['ques'] = ques_merge
+			time = quiz.time_alloted.split(':')
+			context['hours'] = time[0]
+			context['minutes'] = time[1]
+			context['seconds'] = time[2]
 
-		easy_ques = random_ques_list(quiz,EasyQuestionAnwers,easy_count)
-		medium_ques = random_ques_list(quiz,MediumQuestionAnwers,medium_count)
-		hard_ques = random_ques_list(quiz,HardQuestionAnwers,hard_count)
-
-		ques_merge = easy_ques + medium_ques + hard_ques
-		random.shuffle(ques_merge)
-		
-		context['quiz'] = quiz
-		context['ques'] = ques_merge
-		time = quiz.time_alloted.split(':')
-		context['hours'] = time[0]
-		context['minutes'] = time[1]
-		context['seconds'] = time[2]
-
-		return render(request, 'quiz.html', context)
+			return render(request, 'quiz.html', context)
+		except:
+			return HttpResponse("Did you refresh or come to this page directly. \nYou need to fill details inorder to access this page. \nPlease do the needful and try again. \nYour quiz is submitted and marks would be displayed if at all you have refreshed.")
 
 def random_ques_list(quiz,mod,count):
 	query = mod.objects.filter(quiz = quiz)
@@ -376,13 +386,98 @@ def quiz_submit(request,slug):
        context['pass_marks'] = pass_marks
        context['total_marks'] = total_marks
        if achieved_marks >= pass_marks:
+       	result = "pass"
        	context['result'] = "Pass"
+       	context['words'] = quiz.success_text
        else:
+       	result = "fail"
        	context['result'] = "Fail"
+       	context['words'] = quiz.fail_text
+
+       instance = get_object_or_404(User_Detail, id=request.session['id'])
+       instance.status = result
+       instance.quiz = quiz
+       instance.marks_obtained = achieved_marks
+       instance.save()
+       del request.session['id']
        return render(request,'temp.html',context)
 
    elif request.method == 'POST':
        return HttpResponse("There's some problem whle submission. Do try again later!!!")
+
+def user_detail(request,slug):
+	if (request.method == 'POST'):
+		form = UserDetailForm(request.POST)
+		if (form.is_valid()):
+			instance = form.save(commit=False)
+			quiz = Quiz.objects.get(slug = slug)
+			instance.quiz = quiz
+			users = User_Detail.objects.all()
+			flag = False
+			context = {}
+			context['quiz'] = quiz
+			for user in users:
+				if user.email == instance.email and user.quiz == instance.quiz:
+					if user.status == "pass":
+						flag = True
+						context['status'] = user.status
+						context['marks_obtained'] = user.marks_obtained
+						return render(request,'attempt_restriction.html',context)
+					else:
+						seconds = get_time_diff(user.attempted_at)
+						months = seconds / 2.628e+6
+						if months >= 3:
+							instance = get_object_or_404(User_Detail, id=user.id)
+							break
+						else:
+							flag=True
+							months_remaining = math.modf(3 - months)
+							days_remaining = math.modf(months_remaining[0]*30.4167)
+							hours_remaining = math.modf(days_remaining[0]*24)
+							minutes_remaining = math.modf(hours_remaining[0]*60)
+							seconds_remaining = math.modf(minutes_remaining[0] * 60)
+							context['status'] = user.status
+							context['months_remaining'] = int(months_remaining[1])
+							context['days_remaining'] = int(days_remaining[1])
+							context['hours_remaining'] = int(hours_remaining[1])
+							context['minutes_remaining'] = int(minutes_remaining[1])
+							context['seconds_remaining'] = int(seconds_remaining[1])
+							context['marks_obtained'] = user.marks_obtained
+							return render(request,'attempt_restriction.html',context)
+			if not flag:
+				instance.save()
+				request.session['id'] = instance.id
+				return redirect('quiz_ques',slug=quiz.slug)
+	else:
+		form = UserDetailForm()
+	return render(request, 'user_detail.html', {'form': form})
+
+def get_time_diff(attempted_at):
+    if attempted_at:
+        now = datetime.datetime.utcnow().replace(tzinfo=utc)
+        timediff = now - attempted_at
+        return timediff.total_seconds()
+# class CreateQuiz1(LoginRequiredMixin,CreateView):
+# 	form_class = UserDetailForm
+# 	template_name = 'user_detail.html'
+
+# 	def form_valid(self, form):
+# 		instance = form.save(commit = False)
+# 		users = UserDetailForm.objects.all()
+# 		flag = False
+# 		for user in users:
+# 			if user.name == instance.name and user.email == instance.email:
+# 				if user.status == "pass":
+# 					flag = True
+# 					return render(self.request,'attempt_restriction.html',{})
+# 				else:
+
+# 		if not flag:
+# 			self.request
+# 			self.request.session['quiz'] = instance.pk
+# 		return redirect('create_quiz2')
+
+
 
 # from myapp.forms import FormForm
 

@@ -1,0 +1,72 @@
+{% extends 'base_nav.html' %}
+{% block login_active %}active{% endblock %}
+
+{% block body %}
+
+    <div class="container">    
+        <div class="jumbotron" style="margin: 10px;">
+        	{% if status == "pass" %}
+            <h1>Attempt restricted for {{quiz.title}}</h1><br>
+ 			<p><b>You have already passed the test with {{marks_obtained}} marks and obtained your certificate.</b></p>
+ 			<p><b>You are not supposed to re-attempt the test except if you fail.</b></p>
+ 			<p><b>Try some other quizzes in other sections </b></p>
+ 			{% elif status == "fail" %}
+ 			<p><b>You failed the test with {{marks_obtained}} marks. </b></p>
+ 			<p><b>You can re-attempt in: </b></p>
+ 			<p id="timer"><b> </b></p>
+ 			{% endif%}
+        </div>
+	</div>
+
+<br><br>
+<script type="text/javascript">
+var months = Number("{{months_remaining}}");
+var days = Number("{{days_remaining}}")
+var hours = Number("{{hours_remaining}}");
+var minutes = Number("{{minutes_remaining}}");
+var seconds = Number("{{seconds_remaining}}");
+
+// var months = 0;
+// var days = 0;
+// var hours = 0;
+// var minutes = 1;
+// var seconds = 0;
+ 
+if (seconds == 0 && minutes-1 >=0){
+  seconds = 59;
+  minutes-=1;
+}
+document.getElementById("timer").innerHTML = format_time(months)+" months, "+format_time(days)+" days, "+format_time(hours) + " hours, " + format_time(minutes) + " minutes, " + format_time(seconds)+" seconds. ";
+setTimeout(function(){ document.getElementById("timer").innerHTML = format_time(months)+" months, "+format_time(days)+" days, "+format_time(hours) + " hours, " + format_time(minutes) + " minutes, " + format_time(seconds)+" seconds. "; }, 1000);
+
+var x = setInterval(function() {  
+  seconds-=1;
+  if (seconds == 0 && minutes-1 >= 0){
+    seconds = 59;
+    minutes -= 1;
+  }
+  if (minutes == 0 && hours-1 >= 0){
+    minutes = 59;
+    hours -= 1;
+  }
+ if (hours==0 && days-1 >= 0){
+ 	hours = 24;
+ 	days -= 1;
+ }
+ if (days ==0 && months-1>=0){
+ 	days = 30;
+ 	months -= 1;
+ }
+
+  document.getElementById("timer").innerHTML = format_time(months)+" months, "+format_time(days)+" days, "+format_time(hours) + " hours, " + format_time(minutes) + " minutes, " + format_time(seconds)+" seconds. "; 
+      if (months == 0 && days == 0 && hours == 0 && minutes == 0 && seconds == 0) {  
+          alert("Please go back to previous page of filling details!!");
+          clearInterval(x);
+      } 
+}, 1000); 
+function format_time(num){
+  if (num<=9) return number = "0" + String(num);
+  else return String(num);
+}
+</script>
+{% endblock %}

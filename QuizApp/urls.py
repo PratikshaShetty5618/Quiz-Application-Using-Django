@@ -16,6 +16,6 @@ urlpatterns = [
     path('category_quiz/<str:category>', views.CategoryQuiz.as_view(), name = "category_quiz"),
     path('quiz_detail/<slug:slug>', views.QuizDetail.as_view(), name ="quiz_detail"),
     path('quiz_ques/<slug:slug>',views.QuizQuestions.as_view(), name = "quiz_ques"),
-    path('quiz_submit/<slug:slug>',views.quiz_submit, name="quiz_submit")
-
+    path('quiz_submit/<slug:slug>',views.quiz_submit, name="quiz_submit"),
+    path('user_detail/<slug:slug>',views.user_detail,name="user_detail"),
 ]

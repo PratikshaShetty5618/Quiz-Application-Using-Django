@@ -274,8 +274,8 @@ if (seconds == 0 && minutes-1 >=0){
   seconds = 59;
   minutes-=1;
 }
-document.getElementById("timer").innerHTML = format_time(hours) + ":" + format_time(minutes) + ":" + format_time(seconds);
-setTimeout(function(){ document.getElementById("timer").innerHTML = format_time(hours) + ":" + format_time(minutes) + ":" + format_time(seconds); }, 1000);
+document.getElementById("timer").innerHTML = format_time(hours) + "h :" + format_time(minutes) + "m :" + format_time(seconds) + "s";
+setTimeout(function(){ document.getElementById("timer").innerHTML = format_time(hours) + "h :" + format_time(minutes) + "m :" + format_time(seconds) + "s"; }, 1000);
 
 var x = setInterval(function() {  
   seconds-=1;
@@ -288,8 +288,8 @@ var x = setInterval(function() {
     hours -= 1;
   }
 
-  document.getElementById("timer").innerHTML = format_time(hours) + ":" + format_time(minutes) + ":" + format_time(seconds); 
-      if (seconds == 0 && minutes == 0 && seconds == 0) {  
+  document.getElementById("timer").innerHTML = format_time(hours) + "h :" + format_time(minutes) + "m :" + format_time(seconds) + "s"; 
+      if (hours == 0 && minutes == 0 && seconds == 0) {  
           document.getElementById("btn_end").click();
           clearInterval(x);
       } 
@@ -363,6 +363,10 @@ function answer_submit(){
 //     error:function (xhr, textStatus, thrownError){console.log(thrownError);}
 // });
 }
+window.onbeforeunload = function() {
+        document.getElementById("btn_end").click(); 
+        return "Do you want to refresh??"
+    }
 
 </script>
 </body>

@@ -34,7 +34,7 @@
  			{% endif %}
  			{% endif %}
  			<p><b>Time alloted: </b>{{quiz.time_alloted}} ( i.e. {% if hours != "00" %}{{hours}} hours {% endif %}{% if minutes != "00" %}{{minutes}} minutes {% endif %}{% if seconds != "00" %}{{seconds}} seconds {% endif %})</p>
- 			<center><p><a href="{% url 'quiz_ques' quiz.slug %}" role="button" class="btn btn-primary ">Start the Quiz</a></p></center>
+ 			<center><p><a href="{% url 'user_detail' quiz.slug %}" role="button" class="btn btn-primary ">Start the Quiz</a></p></center>
         </div>
 	</div>
 

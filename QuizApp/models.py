@@ -79,11 +79,11 @@ class Quiz(models.Model):
 
     success_text = models.TextField(
         blank=True, help_text=("Displayed if user passes. [Optional]"),
-        verbose_name=("Success Text"))
+        verbose_name=("Success Text"), default = "Hey, you successfully passed the quiz. It was difficult but you indeed succeeded. Congratulations and wish you more success!!!.")
 
     fail_text = models.TextField(
         verbose_name=("Fail Text"),
-        blank=True, help_text=("Displayed if user fails. [Optional]"))
+        blank=True, help_text=("Displayed if user fails. [Optional]"), default = "Hey, you were not able to pass this time. But don't lose hope. Work hard and come with a bang next time.")
 
     time_alloted = models.CharField(
         max_length=250,
@@ -264,4 +264,24 @@ class HardQuestionAnwers(models.Model):
     level = models.CharField(max_length=250, null=False, blank=False, default="hard")
 
     def __str__(self):
-        return self.question    
+        return self.question
+
+class User_Detail(models.Model):
+    STATUS_CHOICES = [
+    ('pass', 'Pass'),
+    ('fail', 'Fail'),
+    ]
+    name = models.CharField(
+        verbose_name=("Name to be written on certificate"),
+        max_length=250, blank=False, help_text=("Do ensure to not make spelling mistakes as certificates cannot be reissued."))
+    email = models.EmailField(
+        verbose_name = ("Email Id where certificate could be sent"),
+        max_length=250, blank=False, help_text=("Do ensure to give proper email address without any errors."))
+    attempted_at = models.DateTimeField(auto_now_add=True)
+    quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
+    marks_obtained = models.SmallIntegerField(
+        null = True, blank=False, default=0)
+    status = models.CharField(max_length=250,choices=STATUS_CHOICES, default='fail')
+
+    def __str__(self):
+        return self.email

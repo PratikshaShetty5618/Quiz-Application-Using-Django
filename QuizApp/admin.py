@@ -20,3 +20,5 @@ admin.site.register(EasyQuestionAnwers)
 admin.site.register(MediumQuestionAnwers)
 
 admin.site.register(HardQuestionAnwers)
+
+admin.site.register(User_Detail)
