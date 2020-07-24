@@ -1,0 +1,18 @@
+{% extends 'base_nav.html' %}
+{% block login_active %}active{% endblock %}
+
+{% block body %}
+
+    <div class="container">    
+        <div class="jumbotron" style="margin: 10px;">
+        	{% if update == "yes" %}
+            	<h1> You have successfully updated your deployed quiz {{title}}</h1><br>
+            {% else %}
+            	<h1> You have successfully deployed your quiz {{title}}</h1><br>
+        	{% endif %}
+        	<center><p><a href="{% url 'index' %}" role="button" class="btn btn-primary ">Go to Home Page</a></p></center>
+        </div>
+	</div>
+
+<br><br>
+{% endblock %}

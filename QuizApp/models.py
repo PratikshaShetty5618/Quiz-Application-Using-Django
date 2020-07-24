@@ -60,7 +60,7 @@ class Quiz(models.Model):
                     "are set?"))
 
     max_questions = models.PositiveIntegerField(
-        blank=True, null=True, verbose_name=("Max Questions"),
+        blank=False, null=True, verbose_name=("Max Questions"),
         help_text=("Number of questions to be asked on each attempt. [Optional]"))
 
     answers_at_end = models.BooleanField(
@@ -90,11 +90,16 @@ class Quiz(models.Model):
         verbose_name=("Time Alloted"),
         blank=False, help_text=("Time to be alloted for Quiz."),)
 
+    # # time_alloted = models.DurationField(
+    #     verbose_name=("Time Alloted"),
+    #     blank=False, help_text=("Time to be alloted for Quiz."),)
     # time_alloted = models.TextField()
 
     slug = models.SlugField(max_length = 250, null = True, blank = True,)
 
     quiz_setter = models.ForeignKey(User,on_delete=models.CASCADE,default=None)
+
+    ready_status = models.BooleanField(blank=True, default=False)
     
 
     def save(self, force_insert=False, force_update=False, *args, **kwargs):
@@ -180,87 +185,141 @@ class Different_Marking(models.Model):
         validators=[MaxValueValidator(100)])
 
 class EasyQuestionAnwers(models.Model):
+    TYPE_CHOICES = [
+    ('single', 'Single Correct Answer'),
+    ('multiple', 'Multiple Correct Answers'),
+    ]
     ANSWER_CHOICES = [
     ('1', 'Option 1'),
     ('2', 'Option 2'),
     ('3', 'Option 3'),
     ('4', 'Option 4'),
+    ('5', 'Option 5'),
     ]
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
+    type_of_quiz = models.CharField(max_length=250, choices=TYPE_CHOICES, default='single')
     question = models.TextField(
         verbose_name=("Question"),
         blank=False)
     option_1 = models.TextField(
         verbose_name=("Type Option 1"),
+        help_text=("Enetr option 1. This field has to be filled compulsorily."),
         blank=False)
     option_2 = models.TextField(
         verbose_name=("Type Option 2"),
-        blank=False)
+        help_text=("Enter option 2. This field has to be filled compulsorily."),
+        blank=True)
     option_3 = models.TextField(
         verbose_name=("Type Option 3"),
-        blank=False)
+        help_text=("Enter option 3. If not required, then skip and leave the field blank."),
+        default="",
+        blank=True)
     option_4 = models.TextField(
         verbose_name=("Type Option 4"),
-        blank=False)
-    answer = models.CharField(max_length=250, choices=ANSWER_CHOICES, default='1')
+        help_text=("Enter option 4. If not required, then skip and leave the field blank."),
+        default="",
+        blank=True)
+    option_5 = models.TextField(
+        verbose_name=("Type Option 5"),
+        help_text=("Enter option 5. If not required, then skip and leave the field blank."),
+        default="",
+        blank=True)
+    answer = models.CharField(max_length=250, choices=ANSWER_CHOICES,  blank=True)
+    answers = models.CharField(max_length=250, default="")
     level = models.CharField(max_length=250, null=False, blank=False, default="easy")
 
     def __str__(self):
         return self.question
 
 class MediumQuestionAnwers(models.Model):
+    TYPE_CHOICES = [
+    ('single', 'Single Correct Answer'),
+    ('multiple', 'Multiple Correct Answers'),
+    ]
     ANSWER_CHOICES = [
     ('1', 'Option 1'),
     ('2', 'Option 2'),
     ('3', 'Option 3'),
     ('4', 'Option 4'),
+    ('5', 'Option 5'),
     ]
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
+    type_of_quiz = models.CharField(max_length=250, choices=TYPE_CHOICES, default='single')
     question = models.TextField(
         verbose_name=("Question"),
         blank=False)
     option_1 = models.TextField(
         verbose_name=("Type Option 1"),
+        help_text=("Enetr option 1. This field has to be filled compulsorily."),
         blank=False)
     option_2 = models.TextField(
         verbose_name=("Type Option 2"),
-        blank=False)
+        help_text=("Enter option 2. This field has to be filled compulsorily."),
+        blank=True)
     option_3 = models.TextField(
         verbose_name=("Type Option 3"),
-        blank=False)
+        help_text=("Enter option 3. If not required, then skip and leave the field blank."),
+        default="",
+        blank=True)
     option_4 = models.TextField(
         verbose_name=("Type Option 4"),
-        blank=False)
-    answer = models.CharField(max_length=250, choices=ANSWER_CHOICES, default='1')
+        help_text=("Enter option 4. If not required, then skip and leave the field blank."),
+        default="",
+        blank=True)
+    option_5 = models.TextField(
+        verbose_name=("Type Option 5"),
+        help_text=("Enter option 5. If not required, then skip and leave the field blank."),
+        default="",
+        blank=True)
+    answer = models.CharField(max_length=250, choices=ANSWER_CHOICES,  blank=True)
+    answers = models.CharField(max_length=250, default="")
     level = models.CharField(max_length=250, null=False, blank=False, default="medium")
 
     def __str__(self):
         return self.question
 
 class HardQuestionAnwers(models.Model):
+    TYPE_CHOICES = [
+    ('single', 'Single Correct Answer'),
+    ('multiple', 'Multiple Correct Answers'),
+    ]
     ANSWER_CHOICES = [
     ('1', 'Option 1'),
     ('2', 'Option 2'),
     ('3', 'Option 3'),
     ('4', 'Option 4'),
+    ('5', 'Option 5'),
     ]
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
+    type_of_quiz = models.CharField(max_length=250, choices=TYPE_CHOICES, default='single')
     question = models.TextField(
         verbose_name=("Question"),
         blank=False)
     option_1 = models.TextField(
         verbose_name=("Type Option 1"),
+        help_text=("Enetr option 1. This field has to be filled compulsorily."),
         blank=False)
     option_2 = models.TextField(
         verbose_name=("Type Option 2"),
-        blank=False)
+        help_text=("Enter option 2. This field has to be filled compulsorily."),
+        blank=True)
     option_3 = models.TextField(
         verbose_name=("Type Option 3"),
-        blank=False)
+        help_text=("Enter option 3. If not required, then skip and leave the field blank."),
+        default="",
+        blank=True)
     option_4 = models.TextField(
         verbose_name=("Type Option 4"),
-        blank=False)
-    answer = models.CharField(max_length=250, choices=ANSWER_CHOICES, default='1')
+        help_text=("Enter option 4. If not required, then skip and leave the field blank."),
+        default="",
+        blank=True)
+    option_5 = models.TextField(
+        verbose_name=("Type Option 5"),
+        help_text=("Enter option 5. If not required, then skip and leave the field blank."),
+        default="",
+        blank=True)
+    answer = models.CharField(max_length=250, choices=ANSWER_CHOICES,  blank=True)
+    answers = models.CharField(max_length=250, default="")
     level = models.CharField(max_length=250, null=False, blank=False, default="hard")
 
     def __str__(self):
@@ -285,3 +344,6 @@ class User_Detail(models.Model):
 
     def __str__(self):
         return self.email
+
+class Entry(models.Model):
+    duration = models.DurationField()

@@ -104,7 +104,7 @@ class SelectTimeWidget(Widget):
             if self.meridiem_val.lower().startswith('p') and hour_val > 12 and hour_val < 24:
                 hour_val = hour_val % 12
         elif hour_val == 0:
-            hour_val = 12
+            hour_val = 0
             
         output = []
         if 'id' in self.attrs:

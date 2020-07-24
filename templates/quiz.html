@@ -209,24 +209,56 @@ p.sticky {
 
       {% if quiz.marking == "same" %}
       {% for q in ques %}
+      <div id="section{{forloop.counter}}">
         <p style="float: right; margin: 5px;">[{{marks}} marks]</p>
         <script type="text/javascript">
           marks.push(Number("{{marks}}"));
           neg_marks.push(Number("{{neg_marks}}"));
         </script>
+       {% if q.type_of_quiz == "single" %}
         <p id="{{forloop.counter}}">{{forloop.counter}}. {{q.question}}</p>
         <input type="radio" id="{{forloop.counter}}option1" name="{{forloop.counter}}" value="1">
         <label for="{{forloop.counter}}option1">{{q.option_1}}</label><br>
         <input type="radio" id="{{forloop.counter}}option2" name="{{forloop.counter}}" value="2">
         <label for="{{forloop.counter}}option2">{{q.option_2}}</label><br>
+        {% if q.option_3 != "" %}
         <input type="radio" id="{{forloop.counter}}option3" name="{{forloop.counter}}" value="3">
         <label for="{{forloop.counter}}option3">{{q.option_3}}</label><br>
+        {% endif %}
+        {% if q.option_4 != "" %}
         <input type="radio" id="{{forloop.counter}}option4" name="{{forloop.counter}}" value="4">
-        <label for="{{forloop.counter}}option4">{{q.option_4}}</label>
+        <label for="{{forloop.counter}}option4">{{q.option_4}}</label><br>
+        {% endif %}
+        {% if q.option_5 != "" %}
+        <input type="radio" id="{{forloop.counter}}option5" name="{{forloop.counter}}" value="5">
+        <label for="{{forloop.counter}}option5">{{q.option_5}}</label>
+        {% endif %}
         <hr>
+        {% elif q.type_of_quiz == "multiple" %}
+        <p id="{{forloop.counter}}">{{forloop.counter}}. {{q.question}}</p>
+        <input type="checkbox" id="{{forloop.counter}}option1" name="{{forloop.counter}}" value="1">
+        <label for="{{forloop.counter}}option1">{{q.option_1}}</label><br>
+        <input type="checkbox" id="{{forloop.counter}}option2" name="{{forloop.counter}}" value="2">
+        <label for="{{forloop.counter}}option2">{{q.option_2}}</label><br>
+        {% if q.option_3 != "" %}
+        <input type="checkbox" id="{{forloop.counter}}option3" name="{{forloop.counter}}" value="3">
+        <label for="{{forloop.counter}}option3">{{q.option_3}}</label><br>
+        {% endif %}
+        {% if q.option_4 != "" %}
+        <input type="checkbox" id="{{forloop.counter}}option4" name="{{forloop.counter}}" value="4">
+        <label for="{{forloop.counter}}option4">{{q.option_4}}</label><br>
+        {% endif %}
+        {% if q.option_5 != "" %}
+        <input type="checkbox" id="{{forloop.counter}}option5" name="{{forloop.counter}}" value="5">
+        <label for="{{forloop.counter}}option5">{{q.option_5}}</label>
+        {% endif %}
+        <hr>
+        {% endif %}
+      </div>
       {% endfor %}
       {% else %}
       {% for q in ques %}
+      <div id="section{{forloop.counter}}">
         {% if q.level == "easy" %}
         <p style="float: right; margin: 5px;">[{{easy_marks}} marks]</p>
         <script type="text/javascript">
@@ -246,16 +278,46 @@ p.sticky {
           neg_marks.push(Number("{{hard_neg_marks}}"));
         </script>
         {% endif %}
+        {% if q.type_of_quiz == "single" %}
         <p id="{{forloop.counter}}">{{forloop.counter}}. {{q.question}}</p>
         <input type="radio" id="{{forloop.counter}}option1" name="{{forloop.counter}}" value="1">
         <label for="{{forloop.counter}}option1">{{q.option_1}}</label><br>
         <input type="radio" id="{{forloop.counter}}option2" name="{{forloop.counter}}" value="2">
         <label for="{{forloop.counter}}option2">{{q.option_2}}</label><br>
+        {% if q.option_3 != "" %}
         <input type="radio" id="{{forloop.counter}}option3" name="{{forloop.counter}}" value="3">
         <label for="{{forloop.counter}}option3">{{q.option_3}}</label><br>
+        {% endif %}
+        {% if q.option_4 != "" %}
         <input type="radio" id="{{forloop.counter}}option4" name="{{forloop.counter}}" value="4">
-        <label for="{{forloop.counter}}option4">{{q.option_4}}</label>
+        <label for="{{forloop.counter}}option4">{{q.option_4}}</label><br>
+        {% endif %}
+        {% if q.option_5 != "" %}
+        <input type="radio" id="{{forloop.counter}}option5" name="{{forloop.counter}}" value="5">
+        <label for="{{forloop.counter}}option5">{{q.option_5}}</label>
+        {% endif %}
         <hr>
+        {% elif q.type_of_quiz == "multiple" %}
+        <p id="{{forloop.counter}}">{{forloop.counter}}. {{q.question}}</p>
+        <input type="checkbox" id="{{forloop.counter}}option1" name="{{forloop.counter}}" value="1">
+        <label for="{{forloop.counter}}option1">{{q.option_1}}</label><br>
+        <input type="checkbox" id="{{forloop.counter}}option2" name="{{forloop.counter}}" value="2">
+        <label for="{{forloop.counter}}option2">{{q.option_2}}</label><br>
+        {% if q.option_3 != "" %}
+        <input type="checkbox" id="{{forloop.counter}}option3" name="{{forloop.counter}}" value="3">
+        <label for="{{forloop.counter}}option3">{{q.option_3}}</label><br>
+        {% endif %}
+        {% if q.option_4 != "" %}
+        <input type="checkbox" id="{{forloop.counter}}option4" name="{{forloop.counter}}" value="4">
+        <label for="{{forloop.counter}}option4">{{q.option_4}}</label><br>
+        {% endif %}
+        {% if q.option_5 != "" %}
+        <input type="checkbox" id="{{forloop.counter}}option5" name="{{forloop.counter}}" value="5">
+        <label for="{{forloop.counter}}option5">{{q.option_5}}</label>
+        {% endif %}
+        <hr>
+        {% endif %}
+      </div>
       {% endfor %}
       {% endif %}
       </div>
@@ -263,6 +325,10 @@ p.sticky {
     </div>
   </div>
 <script> 
+
+
+
+
 var hours = Number("{{hours}}");
 var minutes = Number("{{minutes}}");
 var seconds = Number("{{seconds}}");
@@ -318,8 +384,19 @@ function format_time(num){
 }
 
 var answers = [];
+var type_ans = [];
 {% for i in ques %}
+  {% if i.type_of_quiz == "single" %}
   answers.push(Number("{{i.answer}}"));
+  type_ans.push("single");
+  {% else %}
+  var temp = [];
+  {{i.answers|safe}}.forEach((ans) => {
+    temp.push(Number(ans));
+  });
+  answers.push(temp);
+  type_ans.push("multiple");
+  {% endif %}
 {% endfor %}
 
 console.log(answers);
@@ -334,34 +411,31 @@ function answer_submit(){
   {% endfor %}
   for (var ele=0; ele< answer_store.length ;ele++){
     flag = true;
+    if (type_ans[ele] == "single"){
     for(var i = 0; i < answer_store[ele].length; i++) { 
                 if(answer_store[ele][i].checked){ 
                   user_answers.push(Number(answer_store[ele][i].value));
                   flag = false;
                 }
                 
+            }}
+    else{
+      var store = [];
+      for(var i = 0; i < answer_store[ele].length; i++) { 
+                if(answer_store[ele][i].checked){ 
+                  store.push(Number(answer_store[ele][i].value));
+                  flag = false;
+                }
+                
             }
+          user_answers.push(store);
+    }
             if(flag) user_answers.push(0);
   }
   console.log(user_answers)
 
-  $.get('/quiz/quiz_submit/'+"{{quiz.slug}}", {'answers' : answers, 'marks': marks, 'neg_marks':neg_marks, 'user_answers': user_answers},function(data){$('body').html(data);});
+  $.get('/quiz/quiz_submit/'+"{{quiz.slug}}", {'answers[]' : answers, 'marks[]': marks, 'neg_marks[]':neg_marks, 'user_answers[]': user_answers},function(data){$('body').html(data);});
 
-//   $.ajax({
-//     // points to the url where your data will be posted
-//     url:'/quiz/quiz_submit/'+"{{quiz.slug}}",
-//     // post for security reason
-//     type: "POST",
-//     contentType: 'application/json',
-//     // data that you will like to return 
-//     data: JSON.stringify({'answers' : answers, 'marks': marks, 'neg_marks':neg_marks, 'user_answers': user_answers, 'csrfmiddlewaretoken': '{{csrf_token}}'}),
-//     // what to do when the call is success 
-//     success:function(data){console.log(data);},
-//     // what to do when the call is complete ( you can right your clean from code here)
-//     complete:function(){},
-//     // what to do when there is an error
-//     error:function (xhr, textStatus, thrownError){console.log(thrownError);}
-// });
 }
 window.onbeforeunload = function() {
         document.getElementById("btn_end").click(); 

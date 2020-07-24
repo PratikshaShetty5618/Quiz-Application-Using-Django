@@ -1,0 +1,26 @@
+{% extends 'base_nav.html' %}
+{% block login_active %}active{% endblock %}
+
+{% load crispy_forms_tags %}
+
+{% block body %}
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+
+
+<div class="container">    
+    <div class="jumbotron" style="margin: 10px;">
+    	<center><h1> Your Quizzes </h1></center>
+    </div>
+</div>
+{% if quizzes %}
+
+	<ul class="list-group" style="margin: 10px;">
+      {% for quiz in quizzes %}
+        <li class="list-group-item list-group-item-dark"><h6 style="float:left;">{{quiz.title}}</h6> <a href="{% url 'delete_quiz' quiz.id %}" class="btn btn-danger btn-sm" role="button" style="float: right; margin-right: 5px;">Delete <i class="fa fa-trash"></i></a><a href="{% url 'update_quiz1' quiz.id %}" class="btn btn-info btn-sm" role="button" style="float: right;margin-right: 5px;">Update <i class="fa fa-edit"></i></a></li>
+      {% endfor %}
+    </ul>
+{% else %}
+  	<p class="d-block font-weight-light my-2 heading">You haven't created any quizzes yet!!</p>
+{% endif %}
+
+{% endblock %}

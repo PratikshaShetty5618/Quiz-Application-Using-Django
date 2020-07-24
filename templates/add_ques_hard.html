@@ -56,11 +56,11 @@ body {
 }
 
 .split {
-  height: 100%;
+  height: 95%;
   
   position: fixed;
-  z-index: 1;
-  top: 0;
+
+
   overflow-x: hidden;
   padding-top: 20px;
 }
@@ -141,6 +141,28 @@ background-color: #856f90;
 font-weight: 1000;
 }
 </style>
+<script>
+var selectedType;
+function answer_fields_hide_show(){
+  var selectedType = $("select#id_type_of_quiz").children("option:selected").val();
+  if (selectedType == "single"){
+    $('#div_id_answers').hide();
+    $('#div_id_answer').show();
+    console.log('single');
+  }
+  else{
+    $('#div_id_answer').hide();
+    $('#div_id_answers').show();
+    console.log('mulltiple');
+  }
+}
+$(document).ready(function(){
+  answer_fields_hide_show()
+  $("select#id_type_of_quiz").change(function(){
+      answer_fields_hide_show();
+  });
+});
+</script>
 </head>
 <body>
 
@@ -176,7 +198,7 @@ font-weight: 1000;
 				<div class="form-group">
 					<a href="{% url 'update_quiz1' request.session.quiz %}"><button type="button" class="btn float-left login_btn"> Back </button></a>
 					<input type="submit" value="Save and next" class="btn float-left login_btn">
-					<a href="{% url 'index' %}"><button type="button" class="btn float-right login_btn"> Proceed to Finish </button></a>
+					<a href="{% url 'quiz_complete' %}"><button type="button" class="btn float-right login_btn" onclick = "return getConfirmation()"> Proceed to Finish </button></a>
 					
 				</div>
 			</form>
@@ -184,10 +206,22 @@ font-weight: 1000;
 					
 </center>
 </div>
-     
+<script type="text/javascript">
+  function getConfirmation(){
+
+    if (!confirm("Are you sure the quiz is ready to be deployed???")) {
+        return false;
+    }
+    else{
+      return true;
+    }
+  }
+</script>
 </body>
 </html> 
 
 {% endblock %}
 
+{% block footer%}
 
+{% endblock %}

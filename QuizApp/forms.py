@@ -3,11 +3,11 @@ from .models import *
 from . import select_time_widget
 
 class QuizCreateForm(forms.ModelForm):
-	time_limit = forms.TimeField(help_text='Enter data as Hours:Minutes:Seconds i.e. hh:mm:ss .',widget=select_time_widget.SelectTimeWidget())
+	time_alloted = forms.TimeField(help_text='Enter data as Hours:Minutes:Seconds i.e. hh:mm:ss .',widget=select_time_widget.SelectTimeWidget())
 
 	class Meta:
 		model = Quiz
-		fields = ['title','description','category','random_order','max_questions','answers_at_end','pass_mark','success_text','fail_text','time_limit']
+		fields = ['title','description','category','random_order','max_questions','answers_at_end','pass_mark','success_text','fail_text','marking','time_alloted']
 
 class SameMarkingCreateForm(forms.ModelForm):
 
@@ -22,22 +22,49 @@ class DifferentMarkingCreateForm(forms.ModelForm):
 		fields = ['easy_marks','easy_neg','medium_marks','medium_neg','hard_marks','hard_neg']
 
 class EasyCreateForm(forms.ModelForm):
+	ANSWER_CHOICES = [
+    ('1', 'Option 1'),
+    ('2', 'Option 2'),
+    ('3', 'Option 3'),
+    ('4', 'Option 4'),
+    ('5', 'Option 5'),
+    ]
+	answers = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple,
+                                          choices=ANSWER_CHOICES, required=False, initial="")
 
 	class Meta:
 		model = EasyQuestionAnwers
-		fields = ['question','option_1','option_2','option_3','option_4','answer']
+		fields = ['type_of_quiz','question','option_1','option_2','option_3','option_4','option_5','answer','answers']
 
 class MediumCreateForm(forms.ModelForm):
+	ANSWER_CHOICES = [
+    ('1', 'Option 1'),
+    ('2', 'Option 2'),
+    ('3', 'Option 3'),
+    ('4', 'Option 4'),
+    ('5', 'Option 5'),
+    ]
+	answers = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple,
+                                          choices=ANSWER_CHOICES, required=False, initial="")
 
 	class Meta:
 		model = MediumQuestionAnwers
-		fields = ['question','option_1','option_2','option_3','option_4','answer']
+		fields = ['type_of_quiz','question','option_1','option_2','option_3','option_4','option_5','answer','answers']
 
 class HardCreateForm(forms.ModelForm):
+	ANSWER_CHOICES = [
+    ('1', 'Option 1'),
+    ('2', 'Option 2'),
+    ('3', 'Option 3'),
+    ('4', 'Option 4'),
+    ('5', 'Option 5'),
+    ]
+	answers = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple,
+                                          choices=ANSWER_CHOICES, required=False, initial="")
 
 	class Meta:
 		model = HardQuestionAnwers
-		fields = ['question','option_1','option_2','option_3','option_4','answer']
+		fields = ['type_of_quiz','question','option_1','option_2','option_3','option_4','option_5','answer','answers']
 
 class UserDetailForm(forms.ModelForm):
 

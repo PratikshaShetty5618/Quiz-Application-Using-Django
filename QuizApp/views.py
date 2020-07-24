@@ -13,18 +13,30 @@ from .forms import *
 import random
 from django.utils.timezone import utc
 import math
+from django.contrib import messages
 
 
 # Create your views here.
 
+def quiz_complete(request):
+	context={}
+	quiz = Quiz.objects.get(id=request.session['quiz'],quiz_setter = request.user)
+	if quiz.ready_status:
+		context['update'] = "yes"
+		messages.success(request, 'Updated Quiz successfully')
+	else:
+		context['update'] = "no"
+		messages.success(request, 'Deployed quiz successfully')
+		quiz.ready_status = "True"
+		quiz.save()
+	context['title'] = quiz.title
+	# del request.session['quiz']
+	return render(request, 'quiz_complete.html', context)
+
+
 def index(request):
-	try:
-		del request.session['quiz']
-	except:
-		pass
-	finally:
-		context = {}
-		return render(request, 'index.html', context)
+	context = {}
+	return render(request, 'index.html', context)
 
 class SignupView(CreateView):
     form_class = UserCreationForm
@@ -37,10 +49,11 @@ class CreateQuiz1(LoginRequiredMixin,CreateView):
 
 	def form_valid(self, form):
 		instance = form.save(commit = False)
-		instance.time_alloted = form.cleaned_data.get('time_limit')
+		instance.time_alloted = form.cleaned_data.get('time_alloted')
 		instance.quiz_setter = self.request.user
 		instance.save()
 		self.request.session['quiz'] = instance.pk
+		messages.success(self.request, 'You have successfully initialized your quiz "' + instance.title + '"')
 		return redirect('create_quiz2')
 
 
@@ -51,20 +64,26 @@ class UpdateQuiz1(LoginRequiredMixin,UpdateView):
     
     def form_valid(self, form): 
         instance = form.save(commit=False)
-        instance.time_alloted = form.cleaned_data.get('time_limit')
+        instance.time_alloted = form.cleaned_data.get('time_alloted')
         instance.quiz_setter = self.request.user
         instance.save()
         self.request.session['quiz'] = instance.pk
-        query = Quiz.objects.get(id=self.request.session['quiz'])
-        if 'same' == query.marking:
-        	exist_query = Same_Marking.objects.get(quiz = query)
-        	if exist_query:
-        		return redirect('update_quiz2', id=exist_query.pk)
-        else:
-        	exist_query = Different_Marking.objects.get(quiz = query)
-        	if exist_query:
-        		return redirect('update_quiz2', id=exist_query.pk)
-        return redirect('create_quiz2')
+        try:
+
+        	query = Quiz.objects.get(id=self.request.session['quiz'])
+	        if 'same' == query.marking:
+	        	exist_query = Same_Marking.objects.get(quiz = query)
+	        	if exist_query:
+	        		messages.success(self.request, 'Your initialized quiz "' + instance.title +'" has been successfully updated!')
+	        		return redirect('update_quiz2', id=exist_query.pk)
+	        else:
+	        	exist_query = Different_Marking.objects.get(quiz = query)
+	        	if exist_query:
+	        		messages.success(self.request, 'Your initialized quiz "' + instance.title +'" has been successfully updated!')
+	        		return redirect('update_quiz2', id=exist_query.pk)
+        except:
+        	messages.success(self.request, 'Your initialized quiz "' + instance.title +'" has been successfully updated!')
+        	return redirect('create_quiz2')
 
 @login_required
 def create_quiz2(request):
@@ -76,6 +95,7 @@ def create_quiz2(request):
 				instance = form.save(commit=False)
 				instance.quiz = query
 				instance.save()
+				messages.success(request, 'You have successfully completed the marking scheme of quiz "' + query.title +'".')
 				return redirect('easy_ques')
 		else:
 			form = SameMarkingCreateForm()
@@ -86,6 +106,7 @@ def create_quiz2(request):
 				instance = form.save(commit=False)
 				instance.quiz = query
 				instance.save()
+				messages.success(request, 'You have successfully completed the marking scheme of quiz "' + query.title +'".')
 				return redirect('easy_ques')
 		else:
 			form = DifferentMarkingCreateForm()
@@ -101,6 +122,7 @@ def update_quiz2(request, id):
 	    	instance = form.save(commit=False)
 	    	instance.quiz = query
 	    	form.save()
+	    	messages.success(request, 'You have successfully updated the marking scheme of quiz "' + query.title +'".')
 	    	return redirect('easy_ques')
 	else:
 		instance = get_object_or_404(Different_Marking, id=id)
@@ -109,7 +131,8 @@ def update_quiz2(request, id):
 			instance = form.save(commit=False)
 			instance.quiz = query
 			form.save()
-			return redirect('easy_ques')
+			messages.success(request, 'You have successfully updated the marking scheme of quiz "' + query.title +'".')
+			return redirect('easy_ques')	
 	return render(request, 'create_quiz2.html', {'form': form}) 
 
 class CreateEasyQuiz(LoginRequiredMixin,CreateView):
@@ -126,6 +149,7 @@ class CreateEasyQuiz(LoginRequiredMixin,CreateView):
 		instance = form.save(commit = False)
 		instance.quiz = Quiz.objects.get(id=self.request.session['quiz'])
 		instance.save()
+		messages.success(self.request, 'You have successfully added a question to the Easy Level Questions for Quiz "' + instance.quiz.title +'".')
 		return redirect('easy_ques')
 
 class UpdateEasyQuiz(LoginRequiredMixin,UpdateView):
@@ -143,6 +167,7 @@ class UpdateEasyQuiz(LoginRequiredMixin,UpdateView):
 		instance = form.save(commit = False)
 		instance.quiz = Quiz.objects.get(id=self.request.session['quiz'])
 		instance.save()
+		messages.success(self.request, 'You have successfully updated a question to the Easy Level Questions for Quiz "' + instance.quiz.title +'".')
 		return redirect('easy_ques')
 
 class CreateMediumQuiz(LoginRequiredMixin,CreateView):
@@ -159,6 +184,7 @@ class CreateMediumQuiz(LoginRequiredMixin,CreateView):
 		instance = form.save(commit = False)
 		instance.quiz = Quiz.objects.get(id=self.request.session['quiz'])
 		instance.save()
+		messages.success(self.request, 'You have successfully added a question to the Medium Level Questions for Quiz "' + instance.quiz.title +'".')
 		return redirect('medium_ques')
 
 class UpdateMediumQuiz(LoginRequiredMixin,UpdateView):
@@ -176,6 +202,7 @@ class UpdateMediumQuiz(LoginRequiredMixin,UpdateView):
     	instance = form.save(commit = False)
     	instance.quiz = Quiz.objects.get(id=self.request.session['quiz'])
     	instance.save()
+    	messages.success(self.request, 'You have successfully updated a question to the Medium Level Questions for Quiz "' + instance.quiz.title +'".')
     	return redirect('medium_ques')
 
 class CreateHardQuiz(LoginRequiredMixin,CreateView):
@@ -192,6 +219,7 @@ class CreateHardQuiz(LoginRequiredMixin,CreateView):
 		instance = form.save(commit = False)
 		instance.quiz = Quiz.objects.get(id=self.request.session['quiz'])
 		instance.save()
+		messages.success(self.request, 'You have successfully added a question to the Hard Level Questions for Quiz "' + instance.quiz.title +'".')
 		return redirect('hard_ques')
 
 class UpdateHardQuiz(LoginRequiredMixin,UpdateView):
@@ -209,6 +237,7 @@ class UpdateHardQuiz(LoginRequiredMixin,UpdateView):
 		instance = form.save(commit = False)
 		instance.quiz = Quiz.objects.get(id=self.request.session['quiz'])
 		instance.save()
+		messages.success(self.request, 'You have successfully updated a question to the Hard Level Questions for Quiz "' + instance.quiz.title +'".')
 		return redirect('hard_ques')
 
 class CategoryList(ListView):
@@ -219,7 +248,7 @@ class CategoryList(ListView):
 class CategoryQuiz(View):
 	def get(self,request,*args,**kwargs):
 		category = Category.objects.filter(category = kwargs['category'])
-		quiz = Quiz.objects.filter(category = category[0]).values()
+		quiz = Quiz.objects.filter(category = category[0],ready_status = "True").values()
 		context = {}
 		context['category_quiz'] = quiz
 		context['category'] = kwargs['category']
@@ -400,6 +429,7 @@ def quiz_submit(request,slug):
        instance.marks_obtained = achieved_marks
        instance.save()
        del request.session['id']
+       messages.success(request, 'You have successfully submitted the quiz.')
        return render(request,'temp.html',context)
 
    elif request.method == 'POST':
@@ -457,26 +487,24 @@ def get_time_diff(attempted_at):
         now = datetime.datetime.utcnow().replace(tzinfo=utc)
         timediff = now - attempted_at
         return timediff.total_seconds()
-# class CreateQuiz1(LoginRequiredMixin,CreateView):
-# 	form_class = UserDetailForm
-# 	template_name = 'user_detail.html'
 
-# 	def form_valid(self, form):
-# 		instance = form.save(commit = False)
-# 		users = UserDetailForm.objects.all()
-# 		flag = False
-# 		for user in users:
-# 			if user.name == instance.name and user.email == instance.email:
-# 				if user.status == "pass":
-# 					flag = True
-# 					return render(self.request,'attempt_restriction.html',{})
-# 				else:
+class QuizListView(LoginRequiredMixin,ListView):
+    template_name = 'created_quiz_list.html'
+    model = Quiz
+    context_object_name = 'quizzes' #Context name used in template
 
-# 		if not flag:
-# 			self.request
-# 			self.request.session['quiz'] = instance.pk
-# 		return redirect('create_quiz2')
+    def get_queryset(self): #To show contacts associated to logged in user only and not all
+        quizzes = super().get_queryset()
+        return quizzes.filter(quiz_setter=self.request.user)
 
+class QuizDeleteView(LoginRequiredMixin,DeleteView):
+    model = Quiz
+    template_name = 'delete_quiz.html'
+    success_url = reverse_lazy('quiz_list')
+
+    def delete(self, request, *args, **kwargs):
+        messages.success(self.request, 'Your quiz has been successfully deleted!')
+        return super().delete(self, request, *args, **kwargs)
 
 
 # from myapp.forms import FormForm
