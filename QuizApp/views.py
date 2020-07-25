@@ -265,7 +265,7 @@ class QuizDetail(View):
 			total_marks,neg_marks = par[-1],par[-2]
 			context['neg_marks'] = neg_marks
 		else:
-			par = marks_n_level(quiz)[-1]
+			par = marks_n_level(quiz)
 			total_marks,easy_neg_marks,medium_neg_marks,hard_neg_marks = par[-1],par[-4],par[-3],par[-2]
 			context['easy_neg_marks'] = easy_neg_marks
 			context['medium_neg_marks'] = medium_neg_marks
@@ -404,10 +404,12 @@ def quiz_submit(request,slug):
        ques_count = quiz_actual_question_count(quiz)
        achieved_marks = 0
        for i in range(0,ques_count):
-       	if answers[i] == user_answers[i]:
-       		achieved_marks+=int(marks[i])
-       	else:
-       		achieved_marks-=int(neg_marks[i])
+       	if not (user_answers[i] == "0" or user_answers[i] == "[]"):
+       		print(user_answers[i],answers[i])
+	       	if answers[i] == user_answers[i]:
+	       		achieved_marks+=int(marks[i])
+	       	else:
+	       		achieved_marks-=int(neg_marks[i])
        context = {}
        context['achieved_marks'] = achieved_marks
        total_marks = marks_n_level(quiz)[-1]

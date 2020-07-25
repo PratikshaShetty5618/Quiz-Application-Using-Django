@@ -189,7 +189,7 @@ p.sticky {
         <div class="col-lg-3 col-md-6 col-sm-6" >
           <div class="thumbnail">
           <div class="caption">
-            <p><a href="#{{forloop.counter}}" role="button" class="btn btn-danger btn-block" id="scroll{{forloop.counter}}">{{forloop.counter}}</a></p>
+            <p><a role="button" class="btn btn-danger btn-block" id="scroll{{forloop.counter}}" onclick="scroll_section(this.id)">{{forloop.counter}}</a></p>
           </div>
         </div>
         </div>
@@ -231,8 +231,12 @@ p.sticky {
         {% endif %}
         {% if q.option_5 != "" %}
         <input type="radio" id="{{forloop.counter}}option5" name="{{forloop.counter}}" value="5">
-        <label for="{{forloop.counter}}option5">{{q.option_5}}</label>
+        <label for="{{forloop.counter}}option5">{{q.option_5}}</label><br>
         {% endif %}
+        <p role="button" class="btn btn-warning" id ="next{{forloop.counter}}" onclick="next_section(this.id)" style="float: right;">Next</p>
+        <p role="button" class="btn btn-warning" id ="prev{{forloop.counter}}" onclick="prev_section(this.id)" style="float:left;">Previous</p>
+        <br>
+        
         <hr>
         {% elif q.type_of_quiz == "multiple" %}
         <p id="{{forloop.counter}}">{{forloop.counter}}. {{q.question}}</p>
@@ -250,8 +254,12 @@ p.sticky {
         {% endif %}
         {% if q.option_5 != "" %}
         <input type="checkbox" id="{{forloop.counter}}option5" name="{{forloop.counter}}" value="5">
-        <label for="{{forloop.counter}}option5">{{q.option_5}}</label>
+        <label for="{{forloop.counter}}option5">{{q.option_5}}</label><br>
         {% endif %}
+        <p role="button" class="btn btn-warning" id ="next{{forloop.counter}}" onclick="next_section(this.id)" style="float: right;">Next</p>
+        <p role="button" class="btn btn-warning" id ="prev{{forloop.counter}}" onclick="prev_section(this.id)" style="float:left;">Previous</p>
+        <br>
+        
         <hr>
         {% endif %}
       </div>
@@ -294,8 +302,11 @@ p.sticky {
         {% endif %}
         {% if q.option_5 != "" %}
         <input type="radio" id="{{forloop.counter}}option5" name="{{forloop.counter}}" value="5">
-        <label for="{{forloop.counter}}option5">{{q.option_5}}</label>
+        <label for="{{forloop.counter}}option5">{{q.option_5}}</label><br>
         {% endif %}
+        <p role="button" class="btn btn-warning" id ="next{{forloop.counter}}" onclick="next_section(this.id)" style="float: right;">Next</p>
+        <p role="button" class="btn btn-warning" id ="prev{{forloop.counter}}" onclick="prev_section(this.id)" style="float:left;">Previous</p>
+        <br>
         <hr>
         {% elif q.type_of_quiz == "multiple" %}
         <p id="{{forloop.counter}}">{{forloop.counter}}. {{q.question}}</p>
@@ -313,8 +324,12 @@ p.sticky {
         {% endif %}
         {% if q.option_5 != "" %}
         <input type="checkbox" id="{{forloop.counter}}option5" name="{{forloop.counter}}" value="5">
-        <label for="{{forloop.counter}}option5">{{q.option_5}}</label>
+        <label for="{{forloop.counter}}option5">{{q.option_5}}</label><br>
         {% endif %}
+        <p role="button" class="btn btn-warning" id ="next{{forloop.counter}}" onclick="next_section(this.id)" style="float: right;">Next</p>
+        <p role="button" class="btn btn-warning" id ="prev{{forloop.counter}}" onclick="prev_section(this.id)" style="float:left;">Previous</p>
+        <br>
+        
         <hr>
         {% endif %}
       </div>
@@ -325,9 +340,36 @@ p.sticky {
     </div>
   </div>
 <script> 
+{% for i in ques %}
+  {% if forloop.last %}var last_counter = Number("{{forloop.counter}}"); console.log(last_counter);{% endif %}
+{% endfor %}
+visible(1);
+function prev_section(clicked_id){
+  var got_id = Number(clicked_id.replace('prev',''));
+  if (got_id==1) visible(last_counter);
+  else visible(got_id-1);
+}
+function next_section(clicked_id){
+  var got_id = Number(clicked_id.replace('next',''));
+  if (got_id==last_counter) visible(1);
+  else visible(got_id+1);
+}
 
+function scroll_section(clicked_id){
+  var got_id = Number(clicked_id.replace('scroll',''));
+  visible(got_id);
+}
 
-
+function visible(id_given){
+  {% for i in ques %}
+  if ("{{forloop.counter}}" == String(id_given)){
+    $('#section{{forloop.counter}}').show();
+  }
+  else{
+    $('#section{{forloop.counter}}').hide();
+  }
+  {% endfor %}
+}
 
 var hours = Number("{{hours}}");
 var minutes = Number("{{minutes}}");
@@ -420,15 +462,17 @@ function answer_submit(){
                 
             }}
     else{
+      var flag1 = false;
       var store = [];
       for(var i = 0; i < answer_store[ele].length; i++) { 
                 if(answer_store[ele][i].checked){ 
                   store.push(Number(answer_store[ele][i].value));
+                  flag1 = true;
                   flag = false;
                 }
                 
             }
-          user_answers.push(store);
+          if (flag1) user_answers.push(store);
     }
             if(flag) user_answers.push(0);
   }
